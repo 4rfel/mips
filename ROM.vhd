@@ -1,28 +1,29 @@
-library ieee;
-use ieee.std_logic_1164.all;
+library IEEE;
+use IEEE.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity ROM is
-	generic
-	(
-		dataWidth : natural := 16;
-		addrWidth : natural := 32
-	);
-
-	port (
-		  address : in std_logic_vector (addrWidth-1 DOWNTO 0);
-		  data : out std_logic_vector (dataWidth-1 DOWNTO 0)
-	);
+entity ROM IS
+   generic (
+          dataWidth: natural := 32;
+          addrWidth: natural := 32;
+       memoryAddrWidth:  natural := 6 );   -- 64 posicoes de 32 bits cada
+   port ( clk      : IN  STD_LOGIC;
+          Endereco : IN  STD_LOGIC_VECTOR (addrWidth-1 DOWNTO 0);
+          Dado     : OUT STD_LOGIC_VECTOR (dataWidth-1 DOWNTO 0) );
 end entity;
 
-architecture rtl of ROM is
+architecture assincrona OF ROM IS
+  type blocoMemoria IS ARRAY(0 TO 2**memoryAddrWidth - 1) OF std_logic_vector(dataWidth-1 DOWNTO 0);
 
-	type memory_t is array (2**addrWidth -1 downto 0) of std_logic_vector (dataWidth-1 downto 0);
-	signal content: memory_t;
-	attribute ram_init_file : string;
-	attribute ram_init_file of content:
-	signal is "assembly.mif";
+  signal memROM: blocoMemoria;
+  attribute ram_init_file : string;
+  attribute ram_init_file of memROM:
+  signal is "assembly.mif";
 
-	begin
-		data <= content(to_integer(unsigned(address)));
+-- Utiliza uma quantidade menor de endereços locais:
+   signal EnderecoLocal : std_logic_vector(memoryAddrWidth-1 downto 0);
+
+begin
+  EnderecoLocal <= Endereco(memoryAddrWidth+1 downto 2);
+  Dado <= memROM (to_integer(unsigned(EnderecoLocal)));
 end architecture;

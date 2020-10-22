@@ -5,8 +5,8 @@ entity registrador is
 	generic (
 		data_width : natural := 8
 	);
-	port (DIN     : in std_logic_vector(data_width-1 downto 0);
-		 DOUT     : out std_logic_vector(data_width-1 downto 0);
+	port (DIN     : in std_logic_vector((data_width-1) downto 0);
+		 DOUT     : out std_logic_vector((data_width-1) downto 0);
 		 ENABLE   : in std_logic;
 		 CLK, RST : in std_logic
 		 );
