@@ -7,13 +7,13 @@ entity ROM IS
           dataWidth: natural := 32;
           addrWidth: natural := 32;
        memoryAddrWidth:  natural := 6 );   -- 64 posicoes de 32 bits cada
-   port ( clk      : IN  STD_LOGIC;
-          Endereco : IN  STD_LOGIC_VECTOR (addrWidth-1 DOWNTO 0);
-          Dado     : OUT STD_LOGIC_VECTOR (dataWidth-1 DOWNTO 0) );
+   port ( clk      : in  STD_LOGIC;
+          Endereco : in  STD_LOGIC_VECTOR (addrWidth-1 downto 0);
+          Dado     : out STD_LOGIC_VECTOR (dataWidth-1 downto 0) );
 end entity;
 
-architecture assincrona OF ROM IS
-  type blocoMemoria IS ARRAY(0 TO 2**memoryAddrWidth - 1) OF std_logic_vector(dataWidth-1 DOWNTO 0);
+architecture assincrona of ROM is
+  type blocoMemoria is ARRAY(0 to 2**memoryAddrWidth - 1) of std_logic_vector(dataWidth-1 downto 0);
 
   signal memROM: blocoMemoria;
   attribute ram_init_file : string;
