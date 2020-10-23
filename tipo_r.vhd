@@ -6,7 +6,7 @@ entity tipo_r is
 	generic
 	(
 		rom_width : natural := 32;
-		regs_address_width : natural :=5;
+		regs_address_width : natural := 5;
 		word_width : natural := 32
 	);
 	port
