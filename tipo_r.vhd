@@ -17,7 +17,7 @@ end entity;
 
 architecture rtl of tipo_r is
 	signal outPC, outInc, outRom, outIR : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
-	signal opcode, CTRULA : std_logic_vector(5 downto 0); 
+	signal opcode, CTRULA : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outT, outULA : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD : std_logic;
@@ -61,8 +61,8 @@ architecture rtl of tipo_r is
 		generic map(larguraDados => word_width)
 		port map(clk => clk,
 				enderecoS => RSEND,
-				enderecoT => RDEND,
-				enderecoD => RTEND,
+				enderecoT => RTEND,
+				enderecoD => RDEND,
 				dadoEscritaD => outULA,
 				escreveD => enableWriteD,
 				saidaS => outS,
@@ -71,10 +71,10 @@ architecture rtl of tipo_r is
 		ula_component: entity work.ULA
 		generic map(data_width => word_width)
 		port map(S => outS,
-				 T => outT,
-				 sel => commandULA,
-				 outp => outULA);
-				 
+				T => outT,
+				sel => commandULA,
+				outp => outULA);
+				
 		UC_component: entity work.UC
 		port map(opcode => opcode,
 				funct =>CTRULA,
