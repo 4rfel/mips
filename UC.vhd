@@ -15,13 +15,18 @@ entity UC is
 end entity;
 
 architecture rtl of UC is
-    begin
-        enableWriteD <= '1' when opcode = "000000" else '0';
-        commandULA <= "000" when (unsigned(opcode) = 0 and funct = "100000") else -- add
-                      "001" when (unsigned(opcode) = 0 and funct = "100010") else  -- sub
-                      "010" when (unsigned(opcode) = 0 and funct = "100100") else  -- and
-                      "011" when (unsigned(opcode) = 0 and funct = "100101") else  -- or
-                      "100" when (unsigned(opcode) = 0 and funct = "101010") else  -- maior
-                      "000";
+    signal f_add: std_logic_vector(5 downto 0) := "100000";
+    signal f_sub: std_logic_vector(5 downto 0) := "100010";
+    signal f_and: std_logic_vector(5 downto 0) := "100100";
+    signal f_or: std_logic_vector(5 downto 0) := "100101";
+    signal f_less: std_logic_vector(5 downto 0) := "101010";
+begin
+    enableWriteD <= '1' when opcode = "000000" else '0';
+    commandULA <= "000" when (unsigned(opcode) = 0 and funct = f_add) else -- add
+                  "001" when (unsigned(opcode) = 0 and funct = f_sub) else  -- sub
+                  "010" when (unsigned(opcode) = 0 and funct = f_and) else  -- and
+                  "011" when (unsigned(opcode) = 0 and funct = f_or) else  -- or
+                  "100" when (unsigned(opcode) = 0 and funct = f_less) else  -- menor
+                  "000";
 
 end architecture;
