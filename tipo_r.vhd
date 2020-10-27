@@ -16,7 +16,7 @@ entity tipo_r is
 end entity;
 
 architecture rtl of tipo_r is
-	signal outPC, outInc, outRom, outIR : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
+	signal outPC, outInc, outRom : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
 	signal opcode, CTRULA : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outT, outULA : std_logic_vector((word_width-1) downto 0);
@@ -24,11 +24,11 @@ architecture rtl of tipo_r is
 	signal commandULA : std_logic_vector(2 downto 0);
 
 	begin
-		opcode <= outIR(31 downto 26);
-		RSEND <= outIR(25 downto 21);
-		RTEND <= outIR(20 downto 16);
-		RDEND <= outIR(15 downto 11);
-		CTRULA <= outIR(5 downto 0);
+		opcode <= outRom(31 downto 26);
+		RSEND <= outRom(25 downto 21);
+		RTEND <= outRom(20 downto 16);
+		RDEND <= outRom(15 downto 11);
+		CTRULA <= outRom(5 downto 0);
 
 
 		rom_component: entity work.ROM
@@ -36,14 +36,6 @@ architecture rtl of tipo_r is
 				Endereco => outPC,
 				Dado => outRom);
 		
-		IR_component: entity work.registrador
-		generic map(data_width => rom_width)
-		port map(DIN => outRom,
-				DOUT => outIR,
-				ENABLE => '1',
-				CLK => clk,
-				RST => '0');
-
 		PC_component: entity work.registrador
 		generic map(data_width => rom_width)
 		port map(DIN => outInc,
