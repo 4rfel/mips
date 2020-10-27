@@ -11,7 +11,12 @@ entity mips is
 	);
 	port
 	(
-		clk : in std_logic
+		-- clk : in std_logic;
+		SW : in std_logic_vector(9 downto 0);
+		KEY : in std_logic_vector(3 downto 0);
+
+		LEDR : out std_logic_vector(9 downto 0);
+		HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0) 
 	);
 end entity;
 
@@ -21,10 +26,12 @@ architecture rtl of mips is
 	signal RSEND, RTEND, RDEND, out_muxRT_RD : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outRAM, outT, outULA, out_mux_ime_Rt, out_xnw : std_logic_vector((word_width-1) downto 0);
 	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
-	signal enableWriteD, enableWriteRAM : std_logic;
+	signal enableWriteD, enableWriteRAM : std_logic := '0';
 	signal commandULA : std_logic_vector(2 downto 0);
 	signal selMuxJump : std_logic_vector(1 downto 0);
 	signal muxRT_RD, mux_ime_Rt, mux_xnw : std_logic;
+
+	signal clk : std_logic := '0';
 
 	begin
 		opcode <= outRom(31 downto 26);
