@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;          -- Biblioteca IEEE para funções aritméticas
 
-entity tipo_r is
+entity mips is
 	generic
 	(
 		rom_width : natural := 32;
@@ -15,12 +15,13 @@ entity tipo_r is
 	);
 end entity;
 
-architecture rtl of tipo_r is
-	signal outPC, outInc, outRom : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
+architecture rtl of mips is
+	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
 	signal opcode, CTRULA : std_logic_vector(5 downto 0);
-	signal RSEND, RTEND, RDEND : std_logic_vector((regs_address_width-1) downto 0);
-	signal outS, outT, outULA, out_muxRT_RD, out_mux_ime_Rt, out_xnw : std_logic_vector((word_width-1) downto 0);
-	signal enableWriteD : std_logic;
+	signal RSEND, RTEND, RDEND, out_muxRT_RD : std_logic_vector((regs_address_width-1) downto 0);
+	signal outS, outRAM, outT, outULA, out_mux_ime_Rt, out_xnw : std_logic_vector((word_width-1) downto 0);
+	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
+	signal enableWriteD, enableWriteRAM : std_logic;
 	signal commandULA : std_logic_vector(2 downto 0);
 	signal muxRT_RD, selMuxJump, mux_ime_Rt, mux_xnw : std_logic;
 
@@ -79,14 +80,13 @@ architecture rtl of tipo_r is
 				Endereco => outULA,
 				Dado_in => outT,
 				Dado_out => outRAM,
-				we => enableWriteRAM,
-
+				we => enableWriteRAM);
 		signal_extender_ULA: entity work.signal_extender
-		port map(data_in => outRom,
+		port map(data_in => outRom(15 downto 0),
 				data_out => out_signal_extender);
 
 		signal_extender_Beq: entity work.signal_extender_shift
-		port map(data_in => outRom,
+		port map(data_in => outRom(15 downto 0),
 				data_out => dist);
 
 		adder_component_beq: entity work.adder
@@ -95,18 +95,21 @@ architecture rtl of tipo_r is
 				outp => outBeq);
 
 		mux_jump_component: entity work.mux2x1
+		generic map (data_width => 32)
 		port map(A => outInc,
 				B => outBeq,
 				sel => selMuxJump,
 				outp => outMuxJmp);
-
+		
 		mux_RT_RD_component: entity work.mux2x1
+		generic map (data_width => 5)
 		port map(A => RTEND,
 				B => RDEND,
 				sel => muxRT_RD,
 				outp => out_muxRT_RD);
 
 		mux_ime_RT_component: entity work.mux2x1
+		generic map (data_width => 32)
 		port map(A => outT,
 				B => out_signal_extender,
 				sel => mux_ime_Rt,
@@ -114,6 +117,7 @@ architecture rtl of tipo_r is
 
 		
 		mux_xnw_component: entity work.mux2x1
+		generic map (data_width => 32)
 		port map(A => outULA,
 				B => outRAM,
 				sel => mux_xnw,
