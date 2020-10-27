@@ -40,7 +40,7 @@ architecture rtl of mips is
 		
 		PC_component: entity work.registrador
 		generic map(data_width => rom_width)
-		port map(DIN => outInc,
+		port map(DIN => outMuxJmp,
 				DOUT => outPC,
 				ENABLE => '1',
 				CLK => clk,
@@ -65,7 +65,7 @@ architecture rtl of mips is
 		ula_component: entity work.ULA
 		generic map(data_width => word_width)
 		port map(S => outS,
-				T => outT,
+				T => out_mux_ime_Rt,
 				sel => commandULA,
 				outp => outULA);
 				
