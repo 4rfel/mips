@@ -173,6 +173,7 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 
 set_global_assignment -name VHDL_FILE mux2x1.vhd
+set_global_assignment -name VHDL_FILE mux4x1.vhd
 set_global_assignment -name VHDL_FILE signal_extender_shift.vhd
 set_global_assignment -name VHDL_FILE signal_extender.vhd
 set_global_assignment -name VHDL_FILE mips.vhd

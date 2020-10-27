@@ -23,7 +23,8 @@ architecture rtl of mips is
 	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD, enableWriteRAM : std_logic;
 	signal commandULA : std_logic_vector(2 downto 0);
-	signal muxRT_RD, selMuxJump, mux_ime_Rt, mux_xnw : std_logic;
+	signal selMuxJump : std_logic_vector(1 downto 0);
+	signal muxRT_RD, mux_ime_Rt, mux_xnw : std_logic;
 
 	begin
 		opcode <= outRom(31 downto 26);
@@ -73,7 +74,12 @@ architecture rtl of mips is
 		port map(opcode => opcode,
 				funct =>CTRULA,
 				enableWriteD => enableWriteD,
-				commandULA => commandULA);
+				enableWriteRAM => enableWriteRAM,
+				commandULA => commandULA,
+				mux_jump => selMuxJump,
+				mux_xnw => mux_xnw,
+				muxRT_RD => muxRT_RD,
+				mux_ime_RT => mux_ime_RT);
 
 		RAM_component: entity work.RAM
 		port map(clk => clk,
@@ -94,10 +100,12 @@ architecture rtl of mips is
 				B => dist,
 				outp => outBeq);
 
-		mux_jump_component: entity work.mux2x1
+		mux_jump_component: entity work.mux4x1
 		generic map (data_width => 32)
 		port map(A => outInc,
 				B => outBeq,
+				C => (others => '0'),
+				D => (others => '0'),
 				sel => selMuxJump,
 				outp => outMuxJmp);
 		
@@ -114,7 +122,6 @@ architecture rtl of mips is
 				B => out_signal_extender,
 				sel => mux_ime_Rt,
 				outp => out_mux_ime_Rt);
-
 		
 		mux_xnw_component: entity work.mux2x1
 		generic map (data_width => 32)
