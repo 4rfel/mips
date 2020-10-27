@@ -21,7 +21,7 @@ architecture rtl of UC is
     constant f_or: std_logic_vector(5 downto 0) := "100101";
     constant f_less: std_logic_vector(5 downto 0) := "101010";
 begin
-    enableWriteD <= '1' when opcode = "000000" else '0';
+    enableWriteD <= '1' when (opcode = "000000") or (opcode = "100011") else '0';
     commandULA <= "000" when (unsigned(opcode) = 0 and funct = f_add) else -- add
                   "001" when (unsigned(opcode) = 0 and funct = f_sub) else  -- sub
                   "010" when (unsigned(opcode) = 0 and funct = f_and) else  -- and

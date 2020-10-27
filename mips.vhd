@@ -19,9 +19,10 @@ architecture rtl of tipo_r is
 	signal outPC, outInc, outRom : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
 	signal opcode, CTRULA : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND : std_logic_vector((regs_address_width-1) downto 0);
-	signal outS, outT, outULA : std_logic_vector((word_width-1) downto 0);
+	signal outS, outT, outULA, out_muxRT_RD, out_mux_ime_Rt, out_xnw : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD : std_logic;
 	signal commandULA : std_logic_vector(2 downto 0);
+	signal muxRT_RD, selMuxJump, mux_ime_Rt, mux_xnw : std_logic;
 
 	begin
 		opcode <= outRom(31 downto 26);
@@ -54,8 +55,8 @@ architecture rtl of tipo_r is
 		port map(clk => clk,
 				enderecoS => RSEND,
 				enderecoT => RTEND,
-				enderecoD => RDEND,
-				dadoEscritaD => outULA,
+				enderecoD => out_muxRT_RD,
+				dadoEscritaD => out_xnw,
 				escreveD => enableWriteD,
 				saidaS => outS,
 				saidaT => outT);
@@ -73,5 +74,49 @@ architecture rtl of tipo_r is
 				enableWriteD => enableWriteD,
 				commandULA => commandULA);
 
+		RAM_component: entity work.RAM
+		port map(clk => clk,
+				Endereco => outULA,
+				Dado_in => outT,
+				Dado_out => outRAM,
+				we => enableWriteRAM,
+
+		signal_extender_ULA: entity work.signal_extender
+		port map(data_in => outRom,
+				data_out => out_signal_extender);
+
+		signal_extender_Beq: entity work.signal_extender_shift
+		port map(data_in => outRom,
+				data_out => dist);
+
+		adder_component_beq: entity work.adder
+		port map(A => outInc,
+				B => dist,
+				outp => outBeq);
+
+		mux_jump_component: entity work.mux2x1
+		port map(A => outInc,
+				B => outBeq,
+				sel => selMuxJump,
+				outp => outMuxJmp);
+
+		mux_RT_RD_component: entity work.mux2x1
+		port map(A => RTEND,
+				B => RDEND,
+				sel => muxRT_RD,
+				outp => out_muxRT_RD);
+
+		mux_ime_RT_component: entity work.mux2x1
+		port map(A => outT,
+				B => out_signal_extender,
+				sel => mux_ime_Rt,
+				outp => out_mux_ime_Rt);
+
+		
+		mux_xnw_component: entity work.mux2x1
+		port map(A => outULA,
+				B => outRAM,
+				sel => mux_xnw,
+				outp => out_xnw);
 
 end architecture;

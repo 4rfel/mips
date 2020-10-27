@@ -37,7 +37,7 @@ begin
 	begin
 		if(rising_edge(clk)) then
 			if(we = '1') then
-					memRAM(to_integer(unsigned(EnderecoLocal))) <= Dado_in;
+				memRAM(to_integer(unsigned(EnderecoLocal))) <= Dado_in;
 			end if;
 		end if;
 	end process;
