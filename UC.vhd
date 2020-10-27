@@ -10,7 +10,7 @@ entity UC is
 
         enableWriteD, enableWriteRAM: out std_logic;
         commandULA: out std_logic_vector(2 downto 0);
-        mux_jump : std_logic_vector(1 downto 0);
+        mux_jump : out std_logic_vector(1 downto 0);
         mux_xnw, muxRT_RD, mux_ime_RT: out std_logic
 	);
 end entity;
