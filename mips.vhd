@@ -11,7 +11,7 @@ entity mips is
 	);
 	port
 	(
-		-- clk : in std_logic;
+		clk : in std_logic;
 		SW : in std_logic_vector(9 downto 0);
 		KEY : in std_logic_vector(3 downto 0);
 
@@ -21,7 +21,7 @@ entity mips is
 end entity;
 
 architecture rtl of mips is
-	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
+	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp, jump_abs : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
 	signal opcode, CTRULA : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND, out_muxRT_RD : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outRAM, outT, outULA, out_mux_ime_Rt, out_xnw : std_logic_vector((word_width-1) downto 0);
@@ -29,9 +29,12 @@ architecture rtl of mips is
 	signal enableWriteD, enableWriteRAM : std_logic := '0';
 	signal commandULA : std_logic_vector(2 downto 0);
 	signal selMuxJump : std_logic_vector(1 downto 0);
-	signal muxRT_RD, mux_ime_Rt, mux_xnw : std_logic;
+	signal ime_j : std_logic_vector(25 downto 0);
 
-	signal clk : std_logic := '0';
+	signal muxRT_RD, mux_ime_Rt, mux_xnw, flag_zero, outAnd, out_mux_beq_bne, mux_beq_bne : std_logic;
+	
+
+	-- signal clk : std_logic := '0';
 
 	begin
 		opcode <= outRom(31 downto 26);
@@ -39,6 +42,7 @@ architecture rtl of mips is
 		RTEND <= outRom(20 downto 16);
 		RDEND <= outRom(15 downto 11);
 		CTRULA <= outRom(5 downto 0);
+		ime_j <= outRom(25 downto 0);
 
 
 		rom_component: entity work.ROM
@@ -75,18 +79,20 @@ architecture rtl of mips is
 		port map(S => outS,
 				T => out_mux_ime_Rt,
 				sel => commandULA,
-				outp => outULA);
+				outp => outULA,
+				flag_zero => flag_zero);
 				
 		UC_component: entity work.UC
 		port map(opcode => opcode,
-				funct =>CTRULA,
+				funct => CTRULA,
 				enableWriteD => enableWriteD,
 				enableWriteRAM => enableWriteRAM,
 				commandULA => commandULA,
 				mux_jump => selMuxJump,
 				mux_xnw => mux_xnw,
 				muxRT_RD => muxRT_RD,
-				mux_ime_RT => mux_ime_RT);
+				mux_ime_RT => mux_ime_RT,
+				mux_beq_bne => mux_beq_bne);
 
 		RAM_component: entity work.RAM
 		port map(clk => clk,
@@ -107,13 +113,22 @@ architecture rtl of mips is
 				B => dist,
 				outp => outBeq);
 
+		outAnd <= flag_zero and out_mux_beq_bne;
+
+		mux_beq_bne_component: entity work.mux2x1
+		generic map (data_width => 1)
+		port map(A => flag_zero,
+				B => not flag_zero,
+				sel => mux_beq_bne,
+				outp => out_mux_beq_bne);
+
 		mux_jump_component: entity work.mux4x1
 		generic map (data_width => 32)
 		port map(A => outInc,
 				B => outBeq,
-				C => (others => '0'),
-				D => (others => '0'),
-				sel => selMuxJump,
+				C => jump_abs,
+				D => jump_abs,
+				sel => selMuxJump(1) & outAnd,
 				outp => outMuxJmp);
 		
 		mux_RT_RD_component: entity work.mux2x1
@@ -136,5 +151,10 @@ architecture rtl of mips is
 				B => outRAM,
 				sel => mux_xnw,
 				outp => out_xnw);
+
+		combiner_component: entity work.combiner_PC_ime
+		port map(ime => ime_j,
+				PC => outInc(3 downto 0),
+				outp => jump_abs);
 
 end architecture;

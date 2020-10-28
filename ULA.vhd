@@ -9,9 +9,10 @@ entity ULA is
 		);
 		port
 		(
-			S, T:    in std_logic_vector((data_width-1) downto 0);
-			sel:     in std_logic_vector(2 downto 0);
-			outp:    out std_logic_vector((data_width-1) downto 0)
+			S, T :      in std_logic_vector((data_width-1) downto 0);
+			sel :       in std_logic_vector(2 downto 0);
+			outp :      out std_logic_vector((data_width-1) downto 0);
+			flag_zero : out std_logic
 		);
 end entity;
 
@@ -40,6 +41,8 @@ architecture rtl of ULA is
 					S;      -- outra opcao: outp = A
 
 		outp <= outpp;
+
+		flag_zero <= '1' when unsigned(outpp) = 0 else '0';
 
 
 end architecture;
