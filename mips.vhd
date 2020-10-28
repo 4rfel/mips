@@ -113,14 +113,14 @@ architecture rtl of mips is
 				B => dist,
 				outp => outBeq);
 
-		outAnd <= flag_zero and out_mux_beq_bne;
+		outAnd <= selMuxJump(0) and out_mux_beq_bne;
 
 		mux_beq_bne_component: entity work.mux2x1
 		generic map (data_width => 1)
-		port map(A => flag_zero,
-				B => not flag_zero,
+		port map(A(0) => flag_zero,
+				B(0) => not flag_zero,
 				sel => mux_beq_bne,
-				outp => out_mux_beq_bne);
+				outp(0) => out_mux_beq_bne);
 
 		mux_jump_component: entity work.mux4x1
 		generic map (data_width => 32)
