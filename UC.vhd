@@ -39,13 +39,17 @@ architecture rtl of UC is
     constant o_jr:   std_logic_vector(5 downto 0) := "000000";
 
     signal tipo_i : std_logic;
+    signal write_i : std_logic;
 
 begin
     tipo_i <= '1' when (opcode = o_beq or opcode = o_load or opcode = o_jmp or 
                         opcode = o_addi or opcode = o_ori or opcode = o_andi or
                         opcode = o_slti) else '0';
 
-    enableWriteD <= '1' when (opcode = "000000") or (opcode = o_load) else '0';
+    write_i <= '1' when (opcode = o_load or opcode = o_addi or opcode = o_ori or opcode = o_andi or
+                        opcode = o_slti) else '0';
+
+    enableWriteD <= '1' when (opcode = "000000") or (write_i = '1') else '0';
 
     commandULA <= "000" when (unsigned(opcode) = 0 and funct = f_add) or (opcode = o_addi) else -- add
                   "001" when (unsigned(opcode) = 0 and funct = f_sub) or (opcode = o_beq) or (opcode = o_bne) else  -- sub

@@ -12,11 +12,26 @@ entity mips is
 	port
 	(
 		clk : in std_logic;
-		SW : in std_logic_vector(9 downto 0);
-		KEY : in std_logic_vector(3 downto 0);
+		-- SW : in std_logic_vector(9 downto 0);
+		-- KEY : in std_logic_vector(3 downto 0);
 
-		LEDR : out std_logic_vector(9 downto 0);
-		HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0) 
+		-- LEDR : out std_logic_vector(9 downto 0);
+		-- HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0)
+
+		enableWriteD_out : out std_logic;
+		enableWriteRAM_out : out std_logic;
+		commandULA_out : out std_logic_vector(2 downto 0);
+		mux_jump_out : out std_logic_vector(1 downto 0);
+		mux_xnw_out : out std_logic;
+		muxRT_RD_out : out std_logic;
+		mux_ime_RT_out : out std_logic;
+		mux_beq_bne_out : out std_logic;
+		d_addr_out : out std_logic_vector(4 downto 0);
+
+		outULA_out : out std_logic_vector(31 downto 0);
+
+		S_out, T_out, out_xnw_out : out std_logic_vector((word_width-1) downto 0);
+		outPC_out : out std_logic_vector((rom_width-1) downto 0)
 	);
 end entity;
 
@@ -24,14 +39,14 @@ architecture rtl of mips is
 	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp, jump_abs : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
 	signal opcode, CTRULA : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND, out_muxRT_RD : std_logic_vector((regs_address_width-1) downto 0);
-	signal outS, outRAM, outT, outULA, out_mux_ime_Rt, out_xnw : std_logic_vector((word_width-1) downto 0);
+	signal outS, outRAM, outT, outULA, out_mux_ime_RT, out_xnw : std_logic_vector((word_width-1) downto 0);
 	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD, enableWriteRAM : std_logic := '0';
 	signal commandULA : std_logic_vector(2 downto 0);
 	signal selMuxJump : std_logic_vector(1 downto 0);
 	signal ime_j : std_logic_vector(25 downto 0);
 
-	signal muxRT_RD, mux_ime_Rt, mux_xnw, flag_zero, outAnd, out_mux_beq_bne, mux_beq_bne : std_logic;
+	signal muxRT_RD, mux_ime_RT, mux_xnw, flag_zero, outAnd, out_mux_beq_bne, mux_beq_bne : std_logic;
 	
 
 	-- signal clk : std_logic := '0';
@@ -77,7 +92,7 @@ architecture rtl of mips is
 		ula_component: entity work.ULA
 		generic map(data_width => word_width)
 		port map(S => outS,
-				T => out_mux_ime_Rt,
+				T => out_mux_ime_RT,
 				sel => commandULA,
 				outp => outULA,
 				flag_zero => flag_zero);
@@ -142,8 +157,8 @@ architecture rtl of mips is
 		generic map (data_width => 32)
 		port map(A => outT,
 				B => out_signal_extender,
-				sel => mux_ime_Rt,
-				outp => out_mux_ime_Rt);
+				sel => mux_ime_RT,
+				outp => out_mux_ime_RT);
 		
 		mux_xnw_component: entity work.mux2x1
 		generic map (data_width => 32)
@@ -156,5 +171,23 @@ architecture rtl of mips is
 		port map(ime => ime_j,
 				PC => outInc(3 downto 0),
 				outp => jump_abs);
+		
+		outULA_out <= outULA;
+
+		enableWriteD_out <= enableWriteD;
+		enableWriteRAM_out <= enableWriteRAM;
+		commandULA_out <= commandULA;
+		mux_jump_out <= selMuxJump;
+		mux_xnw_out <= mux_xnw;
+		muxRT_RD_out <= muxRT_RD;
+		mux_ime_RT_out <= mux_ime_RT;
+		mux_beq_bne_out <= mux_beq_bne;
+                S_out <= outS;
+                T_out <= out_mux_ime_RT;
+		d_addr_out <= out_muxRT_RD;
+		out_xnw_out <= out_xnw;
+		outPC_out <= outPC;
+
+
 
 end architecture;
