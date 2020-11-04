@@ -120,7 +120,7 @@ architecture rtl of mips is
 		port map(data_in => outRom(15 downto 0),
 				data_out => out_signal_extender);
 
-		dist <= out_signal_extender sll 2;
+		dist <= out_signal_extender(29 downto 0) & "00";
 
 		adder_component_beq: entity work.adder
 		port map(A => outInc,
