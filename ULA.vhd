@@ -17,8 +17,8 @@ entity ULA is
 end entity;
 
 architecture rtl of ULA is
-	signal add :    std_logic_vector((data_width-1) downto 0);
-	signal sub :    std_logic_vector((data_width-1) downto 0);
+	signal op_add :    std_logic_vector((data_width-1) downto 0);
+	signal op_sub :    std_logic_vector((data_width-1) downto 0);
 	signal op_and : std_logic_vector((data_width-1) downto 0);
 	signal op_or :  std_logic_vector((data_width-1) downto 0);
 	signal outpp :  std_logic_vector((data_width-1) downto 0);
@@ -26,18 +26,18 @@ architecture rtl of ULA is
 
 
 		begin
-			add    <= std_logic_vector(unsigned(S) + unsigned(T));
-			sub    <= std_logic_vector(unsigned(S) - unsigned(T));
+			op_add    <= std_logic_vector(unsigned(S) + unsigned(T));
+			op_sub    <= std_logic_vector(unsigned(S) - unsigned(T));
 			op_and <= S and T;
 			op_or  <= S or T;
 			S_menor_T  <= std_logic_vector(to_unsigned(1, data_width)) when unsigned(S) < unsigned(T) else (others => '0');
 
 
-			outpp <= add       when (sel = "000") else
-					sub        when (sel = "001") else
-					op_and     when (sel = "010") else
-					op_or      when (sel = "011") else
-					S_menor_T  when (sel = "100") else
+			outpp <= op_and    when (sel = "000") else
+					op_or      when (sel = "001") else
+					op_add     when (sel = "010") else
+					op_sub     when (sel = "011") else
+					S_menor_T  when (sel = "111") else
 					S;      -- outra opcao: outp = A
 
 		outp <= outpp;

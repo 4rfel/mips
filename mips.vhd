@@ -42,7 +42,7 @@ architecture rtl of mips is
 	signal outS, outRAM, outT, outULA, out_mux_ime_RT, out_xnw : std_logic_vector((word_width-1) downto 0);
 	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD, enableWriteRAM : std_logic := '0';
-	signal commandULA : std_logic_vector(2 downto 0);
+	signal commandULA, ULAop : std_logic_vector(2 downto 0);
 	signal selMuxJump : std_logic_vector(1 downto 0);
 	signal ime_j : std_logic_vector(25 downto 0);
 
@@ -99,15 +99,19 @@ architecture rtl of mips is
 				
 		UC_component: entity work.UC
 		port map(opcode => opcode,
-				funct => CTRULA,
 				enableWriteD => enableWriteD,
 				enableWriteRAM => enableWriteRAM,
-				commandULA => commandULA,
+				ULAop => ULAop,
 				mux_jump => selMuxJump,
 				mux_xnw => mux_xnw,
 				muxRT_RD => muxRT_RD,
 				mux_ime_RT => mux_ime_RT,
 				mux_beq_bne => mux_beq_bne);
+
+		UC_ULA_component: entity work.UC_ULA
+		port map(ULAop => ULAop,
+				funct => CTRULA,
+				commandULA => commandULA);
 
 		RAM_component: entity work.RAM
 		port map(clk => clk,
