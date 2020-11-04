@@ -31,7 +31,8 @@ entity mips is
 		outULA_out : out std_logic_vector(31 downto 0);
 
 		S_out, T_out, out_xnw_out : out std_logic_vector((word_width-1) downto 0);
-		outPC_out : out std_logic_vector((rom_width-1) downto 0)
+		outPC_out, dist_out, outBeq_out : out std_logic_vector((rom_width-1) downto 0);
+		flag_zero_out : out std_logic
 	);
 end entity;
 
@@ -190,6 +191,10 @@ architecture rtl of mips is
 		d_addr_out <= out_muxRT_RD;
 		out_xnw_out <= out_xnw;
 		outPC_out <= outPC;
+		flag_zero_out <= flag_zero;
+		dist_out <= dist;
+		outBeq_out <= outBeq;
+		
 
 
 

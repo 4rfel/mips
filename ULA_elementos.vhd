@@ -3,10 +3,11 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity ULA_elementos is
-	generic ( data_width : natural := 8);
+	generic ( data_width : natural := 32);
 	port (
-        A, B: in std_logic_vector((data_width-1) downto 0);
-        commandULA : std_logic_vector(2 downto 0);
+        A: in std_logic_vector((data_width-1) downto 0);
+        B: in std_logic_vector((data_width-1) downto 0);
+        commandULA : in std_logic_vector(2 downto 0);
         flag_zero: out std_logic;
 		outp : out std_logic_vector((data_width-1) downto 0)
 	);
@@ -47,5 +48,7 @@ architecture rtl of ULA_elementos is
         SLT <=  zero_vector & (overflow xor outAddSub(data_width-1));
 
         flag_zero <= '1' when (unsigned(outMux4x1) = 0) else '0';
+		  
+		  outp <= outMux4x1;
 		
 end architecture;
