@@ -257,6 +257,8 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[6]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[7]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[8]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[9]
+set_global_assignment -name VHDL_FILE FullAdder.vhd
+set_global_assignment -name VHDL_FILE add_diferenciado.vhd
 set_global_assignment -name VHDL_FILE combiner_PC_ime.vhd
 set_global_assignment -name VHDL_FILE mux2x1.vhd
 set_global_assignment -name VHDL_FILE mux4x1.vhd

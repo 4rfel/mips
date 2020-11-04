@@ -91,9 +91,9 @@ architecture rtl of mips is
 
 		ula_component: entity work.ULA_elementos
 		generic map(data_width => word_width)
-		port map(S => outS,
-				T => out_mux_ime_RT,
-				sel => commandULA,
+		port map(A => outS,
+				B => out_mux_ime_RT,
+				commandULA => commandULA,
 				outp => outULA,
 				flag_zero => flag_zero);
 				
