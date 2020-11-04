@@ -115,13 +115,20 @@ architecture rtl of mips is
 				Dado_in => outT,
 				Dado_out => outRAM,
 				we => enableWriteRAM);
+
 		signal_extender_ULA: entity work.signal_extender
 		port map(data_in => outRom(15 downto 0),
 				data_out => out_signal_extender);
 
-		signal_extender_Beq: entity work.signal_extender_shift
-		port map(data_in => outRom(15 downto 0),
-				data_out => dist);
+		shift_beq_component: entity work.shift_left
+		generic map(data_width => rom_width,
+					shift_amount => 2)
+		port map(A => out_signal_extender,
+				outp => dist);
+
+		-- signal_extender_Beq: entity work.signal_extender_shift
+		-- port map(data_in => outRom(15 downto 0),
+		-- 		data_out => dist);
 
 		adder_component_beq: entity work.adder
 		port map(A => outInc,
@@ -182,8 +189,8 @@ architecture rtl of mips is
 		muxRT_RD_out <= muxRT_RD;
 		mux_ime_RT_out <= mux_ime_RT;
 		mux_beq_bne_out <= mux_beq_bne;
-                S_out <= outS;
-                T_out <= out_mux_ime_RT;
+		S_out <= outS;
+		T_out <= out_mux_ime_RT;
 		d_addr_out <= out_muxRT_RD;
 		out_xnw_out <= out_xnw;
 		outPC_out <= outPC;
