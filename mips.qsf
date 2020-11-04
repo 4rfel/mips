@@ -264,7 +264,7 @@ set_global_assignment -name VHDL_FILE UC_ULA.vhd
 set_global_assignment -name VHDL_FILE signal_extender.vhd
 set_global_assignment -name VHDL_FILE mips.vhd
 set_global_assignment -name VHDL_FILE registrador.vhd
-set_global_assignment -name VHDL_FILE ULA.vhd
+set_global_assignment -name VHDL_FILE ULA_elementos.vhd
 set_global_assignment -name VHDL_FILE adder.vhd
 set_global_assignment -name VHDL_FILE bancoRegistradores.vhd
 set_global_assignment -name VHDL_FILE ROM.vhd

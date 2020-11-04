@@ -5,8 +5,7 @@ entity ULA_elementos is
 	generic ( data_width : natural := 8);
 	port (
         A, B: in std_logic_vector((data_width-1) downto 0);
-        negB: in std_logic;
-        sel : in std_logic_vector(1 downto 0);
+        commandULA : std_logic_vector(2 downto 0);
         flag_zero: out std_logic;
 		outp : out std_logic_vector((data_width-1) downto 0)
 	);
@@ -14,8 +13,11 @@ end entity;
 
 architecture rtl of ULA_elementos is
     signal outMuxB, outAddSub, outMux, SLT, outMux4x1 : std_logic_vector((data_width-1) downto 0);
-    signal overflow : std_logic;
+    signal sel : std_logic_vector(1 downto 0);
+    signal overflow, negB : std_logic;
     begin
+        sel <= commandULA(1 downto 0);
+        negB <= commandULA(2);
 
         mux_notB_component: entity work.mux2x1
         generic map (data_width => data_width)

@@ -89,7 +89,7 @@ architecture rtl of mips is
 				saidaS => outS,
 				saidaT => outT);
 
-		ula_component: entity work.ULA
+		ula_component: entity work.ULA_elementos
 		generic map(data_width => word_width)
 		port map(S => outS,
 				T => out_mux_ime_RT,
