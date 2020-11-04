@@ -21,9 +21,9 @@ architecture rtl of UC_ULA is
 
 begin
     commandULA <= "000" when (ULAop = "010" and funct = f_and) or (ULAop = "011") else -- and
-                  "001" when (ULAop = "010" and funct = f_or) or (ULAop = "100")  else  -- or
+                  "001" when (ULAop = "010" and funct = f_or)  or (ULAop = "100")  else  -- or
                   "010" when (ULAop = "010" and funct = f_add) or (ULAop = "101") else  -- add
-                  "110" when (ULAop = "010" and funct = f_sub) else  -- sub 
+                  "110" when (ULAop = "010" and funct = f_sub) or (ULAop = "001") else  -- sub
                   "111" when (ULAop = "010" and funct = f_slt) or (ULAop = "110") else  -- slt
                   "000";
 

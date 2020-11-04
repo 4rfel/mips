@@ -44,7 +44,7 @@ begin
     enableWriteD <= '1' when (write_i = '1') else '0';
 
     ULAop <= "000" when (opcode = o_load or opcode = o_store) else
-             "001" when (opcode = o_beq)    else
+             "001" when (opcode = o_beq or opcode = o_bne)    else
              "010" when (opcode = o_type_r) else
              "011" when (opcode = o_andi)   else
              "100" when (opcode = o_ori)    else
