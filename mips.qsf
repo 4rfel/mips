@@ -260,7 +260,6 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[9]
 set_global_assignment -name VHDL_FILE combiner_PC_ime.vhd
 set_global_assignment -name VHDL_FILE mux2x1.vhd
 set_global_assignment -name VHDL_FILE mux4x1.vhd
-set_global_assignment -name VHDL_FILE shift_left.vhd
 set_global_assignment -name VHDL_FILE signal_extender_shift.vhd
 set_global_assignment -name VHDL_FILE signal_extender.vhd
 set_global_assignment -name VHDL_FILE mips.vhd
