@@ -8,7 +8,7 @@ entity UC is
         opcode: in std_logic_vector(5 downto 0);
 
         enableWriteD, enableWriteRAM: out std_logic;
-        ULAop: out std_logic_vector(1 downto 0);
+        ULAop: out std_logic_vector(2 downto 0);
         mux_jump : out std_logic_vector(1 downto 0);
         mux_xnw, muxRT_RD, mux_ime_RT, mux_beq_bne: out std_logic
 	);
@@ -49,9 +49,8 @@ begin
              "011" when (opcode = o_andi)   else
              "100" when (opcode = o_ori)    else
              "101" when (opcode = o_addi)   else
-             "110" when (opcode = o_subi)   else
-             "111" when (opcode = o_slti)   else
-             "000";
+             "110" when (opcode = o_slti)   else
+             "111";
 
     mux_xnw <= '1' when opcode = o_load else '0';
 
