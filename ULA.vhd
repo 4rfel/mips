@@ -30,7 +30,7 @@ architecture rtl of ULA is
 			op_sub    <= std_logic_vector(unsigned(S) - unsigned(T));
 			op_and <= S and T;
 			op_or  <= S or T;
-			S_menor_T  <= std_logic_vector(to_unsigned(1, data_width)) when unsigned(S) < unsigned(T) else (others => '0');
+			S_menor_T  <= std_logic_vector(to_unsigned(1, data_width)) when signed(S) < signed(T) else (others => '0');
 
 
 			outpp <= op_and    when (sel = "000") else

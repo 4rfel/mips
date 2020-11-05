@@ -9,8 +9,8 @@ entity UC is
 
         enableWriteD, enableWriteRAM: out std_logic;
         ULAop: out std_logic_vector(2 downto 0);
-        mux_jump : out std_logic_vector(1 downto 0);
-        mux_xnw, muxRT_RD, mux_ime_RT, mux_beq_bne: out std_logic
+        mux_jump, mux_xnw : out std_logic_vector(1 downto 0);
+        muxRT_RD, mux_ime_RT, mux_beq_bne: out std_logic
 	);
 end entity;
 
@@ -26,6 +26,7 @@ architecture rtl of UC is
     constant o_slti: std_logic_vector(5 downto 0) := "001010";
 
     constant o_bne:  std_logic_vector(5 downto 0) := "000101";
+    constant o_lui:  std_logic_vector(5 downto 0) := "111111";
     constant o_jal:  std_logic_vector(5 downto 0) := "000011";
     constant f_jr:   std_logic_vector(5 downto 0) := "001000";
     constant o_type_r:   std_logic_vector(5 downto 0) := "000000";
@@ -52,7 +53,10 @@ begin
              "110" when (opcode = o_slti)   else
              "111";
 
-    mux_xnw <= '1' when opcode = o_load else '0';
+    mux_xnw <= "01" when opcode = o_load else 
+               "10" when opcode = o_jal else 
+               "11" when opcode = o_lui else 
+               "00";
 
     mux_jump <= "01" when (opcode = o_beq) or (opcode = o_bne) else "10" when opcode = o_jmp else "11" when opcode = o_jmp else "00";
 
