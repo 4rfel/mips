@@ -22,7 +22,7 @@ entity mips is
 		enableWriteRAM_out : out std_logic;
 		commandULA_out : out std_logic_vector(2 downto 0);
 		mux_jump_out : out std_logic_vector(1 downto 0);
-		mux_xnw_out : out std_logic;
+		mux_xnw_out : out std_logic_vector(1 downto 0);
 		muxRT_RD_out : out std_logic;
 		mux_ime_RT_out : out std_logic;
 		mux_beq_bne_out : out std_logic;
@@ -79,7 +79,7 @@ architecture rtl of mips is
 				B => std_logic_vector(to_unsigned(4, rom_width)),
 				outp => outInc);
 
-		adder_component: entity work.adder
+		adder_component1: entity work.adder
 		port map(A => outPC,
 				B => std_logic_vector(to_unsigned(8, rom_width)),
 				outp => outPc_mais8);
@@ -174,7 +174,7 @@ architecture rtl of mips is
 		port map(A => outULA,
 				B => outRAM,
 				C => outPc_mais8,  --jal
-				D => out_signal_extender & (others => '0'), ---lui
+				D => outRom(15 downto 0) & std_logic_vector(to_unsigned(0, 16)), ---lui
 				sel => mux_xnw,
 				outp => out_xnw);
 
