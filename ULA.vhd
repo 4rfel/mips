@@ -9,8 +9,8 @@ entity ULA is
 		);
 		port
 		(
-			S, T :      in std_logic_vector((data_width-1) downto 0);
-			sel :       in std_logic_vector(2 downto 0);
+			A, B :      in std_logic_vector((data_width-1) downto 0);
+			commandULA :       in std_logic_vector(2 downto 0);
 			outp :      out std_logic_vector((data_width-1) downto 0);
 			flag_zero : out std_logic
 		);
@@ -25,20 +25,20 @@ architecture rtl of ULA is
 	signal S_menor_T :  std_logic_vector((data_width-1) downto 0);
 
 
-		begin
-			op_add    <= std_logic_vector(unsigned(S) + unsigned(T));
-			op_sub    <= std_logic_vector(unsigned(S) - unsigned(T));
-			op_and <= S and T;
-			op_or  <= S or T;
-			S_menor_T  <= std_logic_vector(to_unsigned(1, data_width)) when signed(S) < signed(T) else (others => '0');
+	begin
+		op_add    <= std_logic_vector(unsigned(A) + unsigned(B));
+		op_sub    <= std_logic_vector(unsigned(A) - unsigned(B));
+		op_and <= A and B;
+		op_or  <= A or B;
+		S_menor_T  <= std_logic_vector(to_unsigned(1, data_width)) when signed(A) < signed(B) else (others => '0');
 
 
-			outpp <= op_and    when (sel = "000") else
-					op_or      when (sel = "001") else
-					op_add     when (sel = "010") else
-					op_sub     when (sel = "011") else
-					S_menor_T  when (sel = "111") else
-					S;      -- outra opcao: outp = A
+		outpp <= op_and    when (commandULA = "000") else
+				op_or      when (commandULA = "001") else
+				op_add     when (commandULA = "010") else
+				op_sub     when (commandULA = "110") else
+				S_menor_T  when (commandULA = "111") else
+				A;      -- outra opcao: outp = A
 
 		outp <= outpp;
 

@@ -9,8 +9,8 @@ entity UC is
 
         enableWriteD, enableWriteRAM: out std_logic;
         ULAop: out std_logic_vector(2 downto 0);
-        mux_jump, mux_xnw : out std_logic_vector(1 downto 0);
-        muxRT_RD, mux_ime_RT, mux_beq_bne: out std_logic
+        mux_xnw : out std_logic_vector(1 downto 0);
+        muxRT_RD, mux_ime_RT, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr: out std_logic
 	);
 end entity;
 
@@ -58,7 +58,11 @@ begin
                "11" when opcode = o_lui else 
                "00";
 
-    mux_jump <= "01" when (opcode = o_beq) or (opcode = o_bne) else "10" when opcode = o_jmp else "11" when opcode = o_jmp else "00";
+    mux_jump_beq <= '1' when (opcode = o_beq) or (opcode = o_bne) else '0';
+
+    mux_jump_j <= '1' when opcode = o_jmp '0';
+
+    muc_jump_jr <= '0';
 
     muxRT_RD <= not tipo_i;
 

@@ -37,17 +37,17 @@ entity mips is
 end entity;
 
 architecture rtl of mips is
-	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp, jump_abs, outPc_mais8 : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
+	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp_beq, outMuxJmp_j, outMuxJmp_jr, jump_abs, outPc_mais8 : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
 	signal opcode, CTRULA : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND, out_muxRT_RD : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outRAM, outT, outULA, out_mux_ime_RT, out_xnw : std_logic_vector((word_width-1) downto 0);
 	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD, enableWriteRAM : std_logic := '0';
 	signal commandULA, ULAop : std_logic_vector(2 downto 0);
-	signal selMuxJump, mux_xnw : std_logic_vector(1 downto 0);
+	signal mux_xnw : std_logic_vector(1 downto 0);
 	signal ime_j : std_logic_vector(25 downto 0);
 
-	signal muxRT_RD, mux_ime_RT, flag_zero, outAnd, out_mux_beq_bne, mux_beq_bne : std_logic;
+	signal muxRT_RD, mux_ime_RT, flag_zero, out_mux_beq_bne, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr : std_logic;
 	
 
 	-- signal clk : std_logic := '0';
@@ -68,7 +68,7 @@ architecture rtl of mips is
 		
 		PC_component: entity work.registrador
 		generic map(data_width => rom_width)
-		port map(DIN => outMuxJmp,
+		port map(DIN => outMuxJmp_jr,
 				DOUT => outPC,
 				ENABLE => '1',
 				CLK => clk,
@@ -108,7 +108,9 @@ architecture rtl of mips is
 				enableWriteD => enableWriteD,
 				enableWriteRAM => enableWriteRAM,
 				ULAop => ULAop,
-				mux_jump => selMuxJump,
+				mux_jump_beq => mux_jump_beq,
+				mux_jump_j => mux_jump_j,
+				mux_jump_jr => mux_jump_jr,
 				mux_xnw => mux_xnw,
 				muxRT_RD => muxRT_RD,
 				mux_ime_RT => mux_ime_RT,
@@ -137,8 +139,6 @@ architecture rtl of mips is
 				B => dist,
 				outp => outBeq);
 
-		outAnd <= selMuxJump(0) and out_mux_beq_bne;
-
 		mux_beq_bne_component: entity work.mux2x1
 		generic map (data_width => 1)
 		port map(A(0) => flag_zero,
@@ -146,14 +146,26 @@ architecture rtl of mips is
 				sel => mux_beq_bne,
 				outp(0) => out_mux_beq_bne);
 
-		mux_jump_component: entity work.mux4x1
+		mux_jump_beq_component: entity work.mux2x1
 		generic map (data_width => 32)
 		port map(A => outInc,
 				B => outBeq,
-				C => jump_abs,
-				D => jump_abs,
-				sel => selMuxJump(1) & outAnd,
-				outp => outMuxJmp);
+				sel => mux_jump_beq and out_mux_beq_bne,
+				outp => outMuxJmp_beq);
+
+		mux_jump_j_component: entity work.mux2x1
+		generic map (data_width => 32)
+		port map(A => outMuxJmp_beq,
+				B => jump_abs,
+				sel => mux_jump_j,
+				outp => outMuxJmp_j);
+
+		mux_jump_jr_component: entity work.mux2x1
+		generic map (data_width => 32)
+		port map(A => outMuxJmp_j,
+				B => outS,
+				sel => mux_jump_jr,
+				outp => outMuxJmp_jr);
 		
 		mux_RT_RD_component: entity work.mux2x1
 		generic map (data_width => 5)
