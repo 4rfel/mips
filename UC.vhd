@@ -26,7 +26,7 @@ architecture rtl of UC is
     constant o_slti: std_logic_vector(5 downto 0) := "001010";
 
     constant o_bne:  std_logic_vector(5 downto 0) := "000101";
-    constant o_lui:  std_logic_vector(5 downto 0) := "111111";
+    constant o_lui:  std_logic_vector(5 downto 0) := "001111";
     constant o_jal:  std_logic_vector(5 downto 0) := "000011";
     constant f_jr:   std_logic_vector(5 downto 0) := "001000";
     constant o_type_r:   std_logic_vector(5 downto 0) := "000000";
@@ -35,9 +35,9 @@ architecture rtl of UC is
     signal write_i : std_logic;
 
 begin
-    tipo_i <= '1' when (opcode = o_beq or opcode = o_load or opcode = o_jmp or 
+    tipo_i <= '1' when (opcode = o_load or opcode = o_store or opcode = o_jmp or
                         opcode = o_addi or opcode = o_ori or opcode = o_andi or
-                        opcode = o_slti) else '0';
+                        opcode = o_slti) else '0'; -- o_beq and o_bne missing
 
     write_i <= '1' when (opcode = o_load or opcode = o_addi or opcode = o_ori or opcode = o_andi or
                         opcode = o_slti or opcode = o_type_r) else '0';
@@ -53,16 +53,16 @@ begin
              "110" when (opcode = o_slti)   else
              "111";
 
-    mux_xnw <= "01" when opcode = o_load else 
-               "10" when opcode = o_jal else 
-               "11" when opcode = o_lui else 
+    mux_xnw <= "01" when opcode = o_load else
+               "10" when opcode = o_jal else
+               "11" when opcode = o_lui else
                "00";
 
     mux_jump_beq <= '1' when (opcode = o_beq) or (opcode = o_bne) else '0';
 
-    mux_jump_j <= '1' when opcode = o_jmp '0';
+    mux_jump_j <= '1' when opcode = o_jmp else '0';
 
-    muc_jump_jr <= '0';
+    mux_jump_jr <= '0';
 
     muxRT_RD <= not tipo_i;
 

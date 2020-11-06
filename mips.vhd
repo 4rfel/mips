@@ -32,6 +32,9 @@ entity mips is
 
 		S_out, T_out, out_xnw_out : out std_logic_vector((word_width-1) downto 0);
 		outPC_out, dist_out, outBeq_out : out std_logic_vector((rom_width-1) downto 0);
+
+        RSEND_out, RTEND_out : out std_logic_vector((regs_address_width-1) downto 0);
+
 		flag_zero_out : out std_logic
 	);
 end entity;
@@ -200,13 +203,15 @@ architecture rtl of mips is
 		enableWriteD_out <= enableWriteD;
 		enableWriteRAM_out <= enableWriteRAM;
 		commandULA_out <= commandULA;
-		mux_jump_out <= selMuxJump;
+		-- mux_jump_out <= selMuxJump;
 		mux_xnw_out <= mux_xnw;
 		muxRT_RD_out <= muxRT_RD;
 		mux_ime_RT_out <= mux_ime_RT;
 		mux_beq_bne_out <= mux_beq_bne;
 		S_out <= outS;
 		T_out <= out_mux_ime_RT;
+        RSEND_out <= RSEND;
+        RTEND_out <= RTEND;
 		d_addr_out <= out_muxRT_RD;
 		out_xnw_out <= out_xnw;
 		outPC_out <= outPC;
