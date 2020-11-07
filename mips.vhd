@@ -42,7 +42,7 @@ end entity;
 architecture rtl of mips is
 	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp_beq, outMuxJmp_j, outMuxJmp_jr, jump_abs, outPc_mais8 : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
 	signal opcode, CTRULA : std_logic_vector(5 downto 0);
-	signal RSEND, RTEND, RDEND, out_muxRT_RD : std_logic_vector((regs_address_width-1) downto 0);
+	signal RSEND, RTEND, RDEND, out_muxRT_RD, out_muxRT_RD_R31 : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outRAM, outT, outULA, out_mux_ime_RT, out_xnw : std_logic_vector((word_width-1) downto 0);
 	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD, enableWriteRAM : std_logic := '0';
@@ -50,7 +50,7 @@ architecture rtl of mips is
 	signal mux_xnw : std_logic_vector(1 downto 0);
 	signal ime_j : std_logic_vector(25 downto 0);
 
-	signal muxRT_RD, mux_ime_RT, flag_zero, out_mux_beq_bne, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr : std_logic;
+	signal muxRT_RD, mux_ime_RT, flag_zero, out_mux_beq_bne, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr, muxRT_RD_R31 : std_logic;
 	
 
 	-- signal clk : std_logic := '0';
@@ -92,7 +92,7 @@ architecture rtl of mips is
 		port map(clk => clk,
 				enderecoS => RSEND,
 				enderecoT => RTEND,
-				enderecoD => out_muxRT_RD,
+				enderecoD => out_muxRT_RD_R31,
 				dadoEscritaD => out_xnw,
 				escreveD => enableWriteD,
 				saidaS => outS,
@@ -116,6 +116,7 @@ architecture rtl of mips is
 				mux_jump_jr => mux_jump_jr,
 				mux_xnw => mux_xnw,
 				muxRT_RD => muxRT_RD,
+				muxRT_RD_R31 => muxRT_RD_R31,
 				mux_ime_RT => mux_ime_RT,
 				mux_beq_bne => mux_beq_bne);
 
@@ -177,6 +178,13 @@ architecture rtl of mips is
 				sel => muxRT_RD,
 				outp => out_muxRT_RD);
 
+		mux_RT_RD_R31_component: entity work.mux2x1
+		generic map (data_width => 5)
+		port map(A => out_muxRT_RD,
+				B => (others => '1'),
+				sel => muxRT_RD_R31,
+				outp => out_muxRT_RD_R31);
+		
 		mux_ime_RT_component: entity work.mux2x1
 		generic map (data_width => 32)
 		port map(A => outT,
