@@ -1,4 +1,5 @@
 begin:
+addi $zero, 0($ra)
 addi $t0, 10($zero)
 addi $t1, 20($zero)
 add $t1, $t0, $t1 # teste1 - resultado: 30
@@ -46,4 +47,6 @@ add $t6, $t6, $t0 # 13
 
 lui $t6, 43690($zero)
 
-beq $zero, $zero, begin
+jal begin
+
+# beq $zero, $zero, begin

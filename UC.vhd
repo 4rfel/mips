@@ -3,15 +3,15 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;          -- Biblioteca IEEE para funções aritméticas
 
 entity UC is
-	port
-	(
+    port
+    (
         opcode: in std_logic_vector(5 downto 0);
 
         enableWriteD, enableWriteRAM: out std_logic;
         ULAop: out std_logic_vector(2 downto 0);
         mux_xnw : out std_logic_vector(1 downto 0);
         muxRT_RD, mux_ime_RT, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr, muxRT_RD_R31: out std_logic
-	);
+    );
 end entity;
 
 architecture rtl of UC is
@@ -40,7 +40,7 @@ begin
                         opcode = o_slti) else '0'; -- o_beq and o_bne missing
 
     write_i <= '1' when (opcode = o_load or opcode = o_addi or opcode = o_ori or opcode = o_andi or
-                        opcode = o_slti or opcode = o_type_r) else '0';
+                        opcode = o_slti or opcode = o_type_r or opcode = o_jal) else '0';
 
     enableWriteD <= '1' when (write_i = '1') else '0';
 
@@ -62,7 +62,7 @@ begin
 
     mux_jump_beq <= '1' when (opcode = o_beq) or (opcode = o_bne) else '0';
 
-    mux_jump_j <= '1' when opcode = o_jmp else '0';
+    mux_jump_j <= '1' when (opcode = o_jmp or opcode = o_jal) else '0';
 
     mux_jump_jr <= '0';
 
