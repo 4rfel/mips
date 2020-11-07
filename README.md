@@ -1,3 +1,3 @@
 # mips
 
-[X] Fofão
+- [X] Fofão
