@@ -6,6 +6,8 @@ entity UC is
     port
     (
         opcode: in std_logic_vector(5 downto 0);
+        funct: in std_logic_vector(5 downto 0);
+
 
         enableWriteD, enableWriteRAM: out std_logic;
         ULAop: out std_logic_vector(2 downto 0);
@@ -32,17 +34,14 @@ architecture rtl of UC is
     constant o_type_r:   std_logic_vector(5 downto 0) := "000000";
 
     signal tipo_i : std_logic;
-    signal write_i : std_logic;
 
 begin
     tipo_i <= '1' when (opcode = o_load or opcode = o_store or opcode = o_jmp or
                         opcode = o_addi or opcode = o_ori or opcode = o_andi or
                         opcode = o_slti) else '0'; -- o_beq and o_bne missing
 
-    write_i <= '1' when (opcode = o_load or opcode = o_addi or opcode = o_ori or opcode = o_andi or
-                        opcode = o_slti or opcode = o_type_r or opcode = o_jal) else '0';
-
-    enableWriteD <= '1' when (write_i = '1') else '0';
+    enableWriteD <= '1' when (opcode = o_load or opcode = o_addi or opcode = o_ori or opcode = o_andi or
+                        opcode = o_slti or (opcode = o_type_r and funct /= f_jr) or opcode = o_jal) else '0';
 
     ULAop <= "000" when (opcode = o_load or opcode = o_store) else
              "001" when (opcode = o_beq or opcode = o_bne)    else
@@ -64,7 +63,7 @@ begin
 
     mux_jump_j <= '1' when (opcode = o_jmp or opcode = o_jal) else '0';
 
-    mux_jump_jr <= '0';
+    mux_jump_jr <= '1' when opcode = o_type_r and funct = f_jr else '0';
 
     muxRT_RD <= not tipo_i;
 

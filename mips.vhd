@@ -41,7 +41,7 @@ end entity;
 
 architecture rtl of mips is
 	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp_beq, outMuxJmp_j, outMuxJmp_jr, jump_abs, outPc_mais8 : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
-	signal opcode, CTRULA : std_logic_vector(5 downto 0);
+	signal opcode, funct : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND, out_muxRT_RD, out_muxRT_RD_R31 : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outRAM, outT, outULA, out_mux_ime_RT, out_xnw : std_logic_vector((word_width-1) downto 0);
 	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
@@ -60,7 +60,7 @@ architecture rtl of mips is
 		RSEND <= outRom(25 downto 21);
 		RTEND <= outRom(20 downto 16);
 		RDEND <= outRom(15 downto 11);
-		CTRULA <= outRom(5 downto 0);
+		funct <= outRom(5 downto 0);
 		ime_j <= outRom(25 downto 0);
 
 
@@ -108,6 +108,7 @@ architecture rtl of mips is
 				
 		UC_component: entity work.UC
 		port map(opcode => opcode,
+				funct => funct,
 				enableWriteD => enableWriteD,
 				enableWriteRAM => enableWriteRAM,
 				ULAop => ULAop,
@@ -122,7 +123,7 @@ architecture rtl of mips is
 
 		UC_ULA_component: entity work.UC_ULA
 		port map(ULAop => ULAop,
-				funct => CTRULA,
+				funct => funct,
 				commandULA => commandULA);
 
 		RAM_component: entity work.RAM
