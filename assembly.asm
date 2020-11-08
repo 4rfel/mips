@@ -47,6 +47,9 @@ add $t6, $t6, $t0 # 13
 
 lui $t6, 43690($zero)
 
-jal begin
+addi $t8, 8($zero)
+
+jr $t8
+# jal begin
 
 # beq $zero, $zero, begin
