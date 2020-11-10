@@ -1,3 +1,4 @@
+lui $t0, 65535($zero)
 begin:
 addi $zero, 0($ra)
 addi $t0, 10($zero)

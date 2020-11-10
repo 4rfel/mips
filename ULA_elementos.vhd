@@ -46,7 +46,7 @@ architecture rtl of ULA_elementos is
                  overflow => overflow);
 
         -- SLT <= zero_vector & (overflow xor outAddSub(data_width-1));
-        SLT <= std_logic_vector(to_unsigned(1, data_width)) when unsigned(A) < unsigned(B) else (others => '0');
+        SLT <= std_logic_vector(to_unsigned(1, data_width)) when signed(A) < signed(B) else (others => '0');
 
 
         flag_zero <= '1' when (unsigned(outMux4x1) = 0) else '0';

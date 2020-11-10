@@ -40,7 +40,7 @@ entity mips is
 end entity;
 
 architecture rtl of mips is
-	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp_beq, outMuxJmp_j, outMuxJmp_jr, jump_abs, outPc_mais8 : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
+	signal outPC, outInc, outRom, dist, outBeq, outMuxJmp_beq, outMuxJmp_j, outMuxJmp_jr, jump_abs, outPc_mais4 : std_logic_vector((rom_width-1) downto 0) := (others =>'0');
 	signal opcode, funct : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND, out_muxRT_RD, out_muxRT_RD_R31 : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outRAM, outT, outULA, out_mux_ime_RT, out_xnw : std_logic_vector((word_width-1) downto 0);
@@ -84,8 +84,8 @@ architecture rtl of mips is
 
 		adder_component1: entity work.adder
 		port map(A => outPC,
-				B => std_logic_vector(to_unsigned(8, rom_width)),
-				outp => outPc_mais8);
+				B => std_logic_vector(to_unsigned(4, rom_width)),
+				outp => outPc_mais4);
 
 		banco_registradores_component: entity work.bancoRegistradores
 		generic map(larguraDados => word_width)
@@ -197,7 +197,7 @@ architecture rtl of mips is
 		generic map (data_width => 32)
 		port map(A => outULA,
 				B => outRAM,
-				C => outPc_mais8,  --jal
+				C => outPc_mais4,  --jal
 				D => outRom(15 downto 0) & std_logic_vector(to_unsigned(0, 16)), ---lui
 				sel => mux_xnw,
 				outp => out_xnw);
