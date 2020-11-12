@@ -18,24 +18,26 @@ entity mips is
 		-- LEDR : out std_logic_vector(9 downto 0);
 		-- HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0)
 
-		enableWriteD_out : out std_logic;
-		enableWriteRAM_out : out std_logic;
-		commandULA_out : out std_logic_vector(2 downto 0);
-		mux_jump_out : out std_logic_vector(1 downto 0);
-		mux_xnw_out : out std_logic_vector(1 downto 0);
-		muxRT_RD_out : out std_logic;
-		mux_ime_RT_out : out std_logic;
-		mux_beq_bne_out : out std_logic;
-		d_addr_out : out std_logic_vector(4 downto 0);
+--		enableWriteD_out : out std_logic;
+--		enableWriteRAM_out : out std_logic;
+--		commandULA_out : out std_logic_vector(2 downto 0);
+--		mux_jump_out : out std_logic_vector(1 downto 0);
+--		mux_xnw_out : out std_logic_vector(1 downto 0);
+--		muxRT_RD_out : out std_logic;
+--		mux_ime_RT_out : out std_logic;
+--		mux_beq_bne_out : out std_logic;
+--		d_addr_out : out std_logic_vector(4 downto 0);
 
-		outULA_out : out std_logic_vector(31 downto 0);
+		PC : out std_logic_vector((rom_width-1) downto 0);
+		ULA : out std_logic_vector(31 downto 0);
+		MUX_XNW_OUT : out std_logic_vector((word_width-1) downto 0)
 
-		S_out, T_out, out_xnw_out : out std_logic_vector((word_width-1) downto 0);
-		outPC_out, dist_out, outBeq_out : out std_logic_vector((rom_width-1) downto 0);
-
-        RSEND_out, RTEND_out : out std_logic_vector((regs_address_width-1) downto 0);
-
-		flag_zero_out : out std_logic
+--		S_out, T_out, out_xnw_out : out std_logic_vector((word_width-1) downto 0);
+--		outPC_out, dist_out, outBeq_out : out std_logic_vector((rom_width-1) downto 0);
+--
+--        RSEND_out, RTEND_out : out std_logic_vector((regs_address_width-1) downto 0);
+--
+--		flag_zero_out : out std_logic
 	);
 end entity;
 
@@ -206,27 +208,27 @@ architecture rtl of mips is
 		port map(ime => ime_j,
 				PC => outInc(31 downto 28),
 				outp => jump_abs);
-		
-		outULA_out <= outULA;
 
-		enableWriteD_out <= enableWriteD;
-		enableWriteRAM_out <= enableWriteRAM;
-		commandULA_out <= commandULA;
-		-- mux_jump_out <= selMuxJump;
-		mux_xnw_out <= mux_xnw;
-		muxRT_RD_out <= muxRT_RD;
-		mux_ime_RT_out <= mux_ime_RT;
-		mux_beq_bne_out <= mux_beq_bne;
-		S_out <= outS;
-		T_out <= out_mux_ime_RT;
-        RSEND_out <= RSEND;
-        RTEND_out <= RTEND;
-		d_addr_out <= out_muxRT_RD;
-		out_xnw_out <= out_xnw;
-		outPC_out <= outPC;
-		flag_zero_out <= flag_zero;
-		dist_out <= dist;
-		outBeq_out <= outBeq;
+		PC <= outPC;		
+		ULA <= outULA;
+		MUX_XNW_OUT <= out_xnw;
+
+--		enableWriteD_out <= enableWriteD;
+--		enableWriteRAM_out <= enableWriteRAM;
+--		commandULA_out <= commandULA;
+--		-- mux_jump_out <= selMuxJump;
+--		mux_xnw_out <= mux_xnw;
+--		muxRT_RD_out <= muxRT_RD;
+--		mux_ime_RT_out <= mux_ime_RT;
+--		mux_beq_bne_out <= mux_beq_bne;
+--		S_out <= outS;
+--		T_out <= out_mux_ime_RT;
+--        RSEND_out <= RSEND;
+--        RTEND_out <= RTEND;
+--		d_addr_out <= out_muxRT_RD;
+--		flag_zero_out <= flag_zero;
+--		dist_out <= dist;
+--		outBeq_out <= outBeq;
 		
 
 
