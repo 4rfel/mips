@@ -65,7 +65,7 @@ set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_
 # Configuração dos pinos utilizados em Design de Computadores {{{
 
 # CLOCK {{{
-set_location_assignment PIN_M9 -to clk
+set_location_assignment PIN_M9 -to clk_soninho
 # }}}
 
 # HEX0 {{{

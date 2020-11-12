@@ -2,6 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;          -- Biblioteca IEEE para funções aritméticas
 
+-- Rafael dos Santos, Thomas Queiroz Shinalder, Joao Pedro Meirelez
+
 entity mips is
 	generic
 	(
@@ -11,12 +13,12 @@ entity mips is
 	);
 	port
 	(
-		clk : in std_logic;
-		-- SW : in std_logic_vector(9 downto 0);
-		-- KEY : in std_logic_vector(3 downto 0);
+		clk_soninho : in std_logic;
+		SW : in std_logic_vector(9 downto 0);
+		KEY : in std_logic_vector(3 downto 0);
 
-		-- LEDR : out std_logic_vector(9 downto 0);
-		-- HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0)
+		LEDR : out std_logic_vector(9 downto 0);
+		HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0)
 
 --		enableWriteD_out : out std_logic;
 --		enableWriteRAM_out : out std_logic;
@@ -46,16 +48,16 @@ architecture rtl of mips is
 	signal opcode, funct : std_logic_vector(5 downto 0);
 	signal RSEND, RTEND, RDEND, out_muxRT_RD, out_muxRT_RD_R31 : std_logic_vector((regs_address_width-1) downto 0);
 	signal outS, outRAM, outT, outULA, out_mux_ime_RT, out_xnw : std_logic_vector((word_width-1) downto 0);
-	signal out_signal_extender : std_logic_vector((word_width-1) downto 0);
+	signal out_signal_extender, out_mux_sleep : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD, enableWriteRAM : std_logic := '0';
 	signal commandULA, ULAop : std_logic_vector(2 downto 0);
 	signal mux_xnw : std_logic_vector(1 downto 0);
 	signal ime_j : std_logic_vector(25 downto 0);
-
+	signal outHex0, outHex1, outHex2, outHex3, outHex4, outHex5 : std_logic_vector(6 downto 0);
 	signal muxRT_RD, mux_ime_RT, flag_zero, out_mux_beq_bne, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr, muxRT_RD_R31 : std_logic;
 	
 
-	-- signal clk : std_logic := '0';
+	signal clk : std_logic := '0';
 
 	begin
 		opcode <= outRom(31 downto 26);
@@ -65,6 +67,10 @@ architecture rtl of mips is
 		funct <= outRom(5 downto 0);
 		ime_j <= outRom(25 downto 0);
 
+		clk_botao_component: entity work.edgeDetector
+		port map(clk => clk_soninho,
+				entrada => not KEY(0),
+				saida => clk);
 
 		rom_component: entity work.ROM
 		port map(clk => clk,
@@ -77,7 +83,7 @@ architecture rtl of mips is
 				DOUT => outPC,
 				ENABLE => '1',
 				CLK => clk,
-				RST => '0');
+				RST => not KEY(1));
 
 		adder_component: entity work.adder
 		port map(A => outPC,
@@ -213,18 +219,63 @@ architecture rtl of mips is
 		ULA <= outULA;
 		MUX_XNW_OUT <= out_xnw;
 
+		mux_sleep_component: entity work.mux4x1
+		generic map (data_width => 32)
+		port map(A => outPC,
+				B => outMuxJmp_jr,
+				C => outULA,
+				D => out_xnw,
+				sel => SW(1 downto 0),
+				outp => out_mux_sleep);
+
+		conversorHEX0: entity work.conversorHex7Seg
+		port map(dadoHex => out_mux_sleep(3 downto 0),
+				saida7seg => outHex0);
+
+		HEX0 <= outHex0;
+
+		conversorHEX1: entity work.conversorHex7Seg
+		port map(dadoHex => out_mux_sleep(7 downto 4),
+				saida7seg => outHex1);
+
+		HEX1 <= outHex1;
+
+		conversorHEX2: entity work.conversorHex7Seg
+		port map(dadoHex => out_mux_sleep(11 downto 8),
+				saida7seg => outHex2);
+				
+		HEX2 <= outHex2;
+
+		conversorHEX3: entity work.conversorHex7Seg
+		port map(dadoHex => out_mux_sleep(15 downto 12),
+				saida7seg => outHex3);
+				
+		HEX3 <= outHex3;
+
+		conversorHEX4: entity work.conversorHex7Seg
+		port map(dadoHex => out_mux_sleep(19 downto 16),
+				saida7seg => outHex4);
+				
+		HEX4 <= outHex4;
+
+		conversorHEX5: entity work.conversorHex7Seg
+		port map(dadoHex => out_mux_sleep(23 downto 20),
+				saida7seg => outHex5);
+				
+		HEX5 <= outHex5;
+
 --		enableWriteD_out <= enableWriteD;
 --		enableWriteRAM_out <= enableWriteRAM;
 --		commandULA_out <= commandULA;
---		-- mux_jump_out <= selMuxJump;
+--		mux_jump_out <= selMuxJump;
 --		mux_xnw_out <= mux_xnw;
 --		muxRT_RD_out <= muxRT_RD;
 --		mux_ime_RT_out <= mux_ime_RT;
 --		mux_beq_bne_out <= mux_beq_bne;
 --		S_out <= outS;
 --		T_out <= out_mux_ime_RT;
---        RSEND_out <= RSEND;
---        RTEND_out <= RTEND;
+--      RSEND_out <= RSEND;
+--      RTEND_out <= RTEND;
 --		d_addr_out <= out_muxRT_RD;
 --		flag_zero_out <= flag_zero;
 --		dist_out <= dist;
