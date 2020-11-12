@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;          -- Biblioteca IEEE para funções aritméticas
 
--- Rafael dos Santos, Thomas Queiroz Shinalder, Joao Pedro Meirelez
+-- Rafael dos Santos, Thomas Queiroz, Joao Pedro Meirelez
 
 entity mips is
 	generic
