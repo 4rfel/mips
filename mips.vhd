@@ -204,7 +204,7 @@ architecture rtl of mips is
 
 		combiner_component: entity work.combiner_PC_ime
 		port map(ime => ime_j,
-				PC => outInc(3 downto 0),
+				PC => outInc(31 downto 28),
 				outp => jump_abs);
 		
 		outULA_out <= outULA;
