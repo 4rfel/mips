@@ -51,10 +51,10 @@ architecture rtl of mips is
 	signal out_signal_extender, out_mux_sleep : std_logic_vector((word_width-1) downto 0);
 	signal enableWriteD, enableWriteRAM : std_logic := '0';
 	signal commandULA, ULAop : std_logic_vector(2 downto 0);
-	signal mux_xnw : std_logic_vector(1 downto 0);
+	signal mux_xnw, mux_ime_RT : std_logic_vector(1 downto 0);
 	signal ime_j : std_logic_vector(25 downto 0);
 	signal outHex0, outHex1, outHex2, outHex3, outHex4, outHex5 : std_logic_vector(6 downto 0);
-	signal muxRT_RD, mux_ime_RT, flag_zero, out_mux_beq_bne, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr, muxRT_RD_R31 : std_logic;
+	signal muxRT_RD, flag_zero, out_mux_beq_bne, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr, muxRT_RD_R31 : std_logic;
 	
 
 	signal clk : std_logic := '0';
@@ -194,10 +194,12 @@ architecture rtl of mips is
 				sel => muxRT_RD_R31,
 				outp => out_muxRT_RD_R31);
 		
-		mux_ime_RT_component: entity work.mux2x1
+		mux_ime_RT_component: entity work.mux4x1
 		generic map (data_width => 32)
 		port map(A => outT,
 				B => out_signal_extender,
+				C => std_logic_vector(to_unsigned(0, 16)) & outRom(15 downto 0),
+				D => (others => '0'),
 				sel => mux_ime_RT,
 				outp => out_mux_ime_RT);
 		
