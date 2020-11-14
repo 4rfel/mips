@@ -18,7 +18,7 @@ entity mips is
 		KEY : in std_logic_vector(3 downto 0);
 
 		LEDR : out std_logic_vector(9 downto 0);
-		HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : std_logic_vector(6 downto 0)
+		HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : out std_logic_vector(6 downto 0);
 
 --		enableWriteD_out : out std_logic;
 --		enableWriteRAM_out : out std_logic;
@@ -29,17 +29,18 @@ entity mips is
 --		mux_ime_RT_out : out std_logic;
 --		mux_beq_bne_out : out std_logic;
 --		d_addr_out : out std_logic_vector(4 downto 0);
-
-		PC : out std_logic_vector((rom_width-1) downto 0);
-		ULA : out std_logic_vector(31 downto 0);
-		MUX_XNW_OUT : out std_logic_vector((word_width-1) downto 0)
-
---		S_out, T_out, out_xnw_out : out std_logic_vector((word_width-1) downto 0);
+		-- S_out, T_out: out std_logic_vector((word_width-1) downto 0);
+        -- out_xnw_out : out std_logic_vector((word_width-1) downto 0);
 --		outPC_out, dist_out, outBeq_out : out std_logic_vector((rom_width-1) downto 0);
 --
 --        RSEND_out, RTEND_out : out std_logic_vector((regs_address_width-1) downto 0);
 --
 --		flag_zero_out : out std_logic
+
+		PC : out std_logic_vector((rom_width-1) downto 0);
+		ULA : out std_logic_vector(31 downto 0);
+		MUX_XNW_OUT : out std_logic_vector((word_width-1) downto 0)
+
 	);
 end entity;
 
@@ -71,6 +72,7 @@ architecture rtl of mips is
 		port map(clk => clk_soninho,
 				entrada => not KEY(0),
 				saida => clk);
+--		clk <= clk_soninho;
 
 		rom_component: entity work.ROM
 		port map(clk => clk,
@@ -230,40 +232,36 @@ architecture rtl of mips is
 				sel => SW(1 downto 0),
 				outp => out_mux_sleep);
 
+
 		conversorHEX0: entity work.conversorHex7Seg
 		port map(dadoHex => out_mux_sleep(3 downto 0),
 				saida7seg => outHex0);
-
-		HEX0 <= outHex0;
 
 		conversorHEX1: entity work.conversorHex7Seg
 		port map(dadoHex => out_mux_sleep(7 downto 4),
 				saida7seg => outHex1);
 
-		HEX1 <= outHex1;
-
 		conversorHEX2: entity work.conversorHex7Seg
 		port map(dadoHex => out_mux_sleep(11 downto 8),
 				saida7seg => outHex2);
-				
-		HEX2 <= outHex2;
 
 		conversorHEX3: entity work.conversorHex7Seg
 		port map(dadoHex => out_mux_sleep(15 downto 12),
 				saida7seg => outHex3);
-				
-		HEX3 <= outHex3;
 
 		conversorHEX4: entity work.conversorHex7Seg
 		port map(dadoHex => out_mux_sleep(19 downto 16),
 				saida7seg => outHex4);
-				
-		HEX4 <= outHex4;
 
 		conversorHEX5: entity work.conversorHex7Seg
 		port map(dadoHex => out_mux_sleep(23 downto 20),
 				saida7seg => outHex5);
-				
+
+		HEX0 <= outHex0;
+		HEX1 <= outHex1;
+		HEX2 <= outHex2;
+		HEX3 <= outHex3;
+		HEX4 <= outHex4;
 		HEX5 <= outHex5;
 
 --		enableWriteD_out <= enableWriteD;
@@ -274,8 +272,8 @@ architecture rtl of mips is
 --		muxRT_RD_out <= muxRT_RD;
 --		mux_ime_RT_out <= mux_ime_RT;
 --		mux_beq_bne_out <= mux_beq_bne;
---		S_out <= outS;
---		T_out <= out_mux_ime_RT;
+		-- S_out <= outS;
+		-- T_out <= out_mux_ime_RT;
 --      RSEND_out <= RSEND;
 --      RTEND_out <= RTEND;
 --		d_addr_out <= out_muxRT_RD;

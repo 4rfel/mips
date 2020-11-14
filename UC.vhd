@@ -34,8 +34,6 @@ architecture rtl of UC is
     constant o_type_r:   std_logic_vector(5 downto 0) := "000000";
 
 begin
-    tipo_i <= ; -- o_beq and o_bne missing
-
     enableWriteD <= '1' when (opcode = o_load or opcode = o_addi or opcode = o_ori or opcode = o_andi or
                         opcode = o_slti or (opcode = o_type_r and funct /= f_jr) or opcode = o_jal) else '0';
 
@@ -61,13 +59,14 @@ begin
 
     mux_jump_jr <= '1' when opcode = o_type_r and funct = f_jr else '0';
 
-    muxRT_RD <= '1' when (opcode = o_load or opcode = o_store or
-                opcode = o_addi or opcode = o_ori or opcode = o_andi or
-                opcode = o_slti) else '0';
+    muxRT_RD <= '1' when (opcode = o_type_r) else '0';
+                -- '0' when (opcode = o_load or opcode = o_store or
+                -- opcode = o_addi or opcode = o_ori or opcode = o_andi or
+                -- opcode = o_slti) else '1';
 
     mux_ime_RT <= "01" when (opcode = o_load or opcode = o_store or
-                          or opcode = o_andi or opcode = o_slti) else 
-                  '10' when (opcode = o_andi or opcode = o_ori) else "00";
+                             opcode = o_addi or opcode = o_slti) else
+                  "10" when (opcode = o_andi or opcode = o_ori) else "00";
 
     enableWriteRAM <= '1' when opcode = o_store else '0';
 
