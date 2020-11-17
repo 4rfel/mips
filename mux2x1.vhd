@@ -13,5 +13,6 @@ end entity;
 
 architecture rtl of mux2x1 is
 	begin
+		-- Se sel for 1 output B caso contrario A
 		outp <= B when (sel = '1') else A;
 end architecture;

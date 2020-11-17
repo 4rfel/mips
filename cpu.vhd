@@ -36,6 +36,7 @@ architecture rtl of cpu is
 	
 
 	begin
+		-- Extrai as informacoes necessarias vinda da ROM
 		opcode <= outRom(31 downto 26);
 		RSEND <= outRom(25 downto 21);
 		RTEND <= outRom(20 downto 16);
@@ -43,11 +44,13 @@ architecture rtl of cpu is
 		funct <= outRom(5 downto 0);
 		ime_j <= outRom(25 downto 0);
 
+		-- Declaracao da ROM
 		rom_component: entity work.ROM
 		port map(clk => clk,
 				Endereco => outPC,
 				Dado => outRom);
 		
+		-- Declaracao do PC
 		PC_component: entity work.registrador
 		generic map(data_width => rom_width)
 		port map(DIN => outMuxJmp_jr,
@@ -56,16 +59,19 @@ architecture rtl of cpu is
 				CLK => clk,
 				RST => rst);
 
+		-- Declaracao do componente que incrementa o PC em 4 (PC+4)
 		adder_component: entity work.adder
 		port map(A => outPC,
 				B => std_logic_vector(to_unsigned(4, rom_width)),
 				outp => outInc);
 
+		-- Declaracao do componente que incrementa o PC em 4 (PC+4)
 		adder_component1: entity work.adder
 		port map(A => outPC,
 				B => std_logic_vector(to_unsigned(4, rom_width)),
 				outp => outPc_mais4);
 
+		-- Declaracao do banco de registradores
 		banco_registradores_component: entity work.bancoRegistradores
 		generic map(larguraDados => word_width)
 		port map(clk => clk,
@@ -77,6 +83,7 @@ architecture rtl of cpu is
 				saidaS => outS,
 				saidaT => outT);
 
+		-- Declaracao da ULA
 		ula_component: entity work.ULA_elementos
 		generic map(data_width => word_width)
 		port map(A => outS,
@@ -84,7 +91,8 @@ architecture rtl of cpu is
 				commandULA => commandULA,
 				outp => outULA,
 				flag_zero => flag_zero);
-				
+		
+		-- Declaracao da Unidade de Controle do fluxo de dados
 		UC_component: entity work.UC
 		port map(opcode => opcode,
 				funct => funct,
@@ -100,11 +108,13 @@ architecture rtl of cpu is
 				mux_ime_RT => mux_ime_RT,
 				mux_beq_bne => mux_beq_bne);
 
+		-- Declaracao da Unidade de Controle da ULA
 		UC_ULA_component: entity work.UC_ULA
 		port map(ULAop => ULAop,
 				funct => funct,
 				commandULA => commandULA);
 
+		-- Declaracao da RAM
 		RAM_component: entity work.RAM
 		port map(clk => clk,
 				Endereco => outULA,
@@ -112,17 +122,21 @@ architecture rtl of cpu is
 				Dado_out => outRAM,
 				we => enableWriteRAM);
 
+		-- Declaracao do extensor de sinal da ULA
 		signal_extender_ULA: entity work.signal_extender
 		port map(data_in => outRom(15 downto 0),
 				data_out => out_signal_extender);
 
+		-- Offset do endereco de branch
 		dist <= out_signal_extender(29 downto 0) & "00";
 
+		-- Declaracao do componente adder para as instrucoes de branch
 		adder_component_beq: entity work.adder
 		port map(A => outInc,
 				B => dist,
 				outp => outBeq);
 
+		-- Mux que escolhe entre BEQ e BNE
 		mux_beq_bne_component: entity work.mux2x1
 		generic map (data_width => 1)
 		port map(A(0) => flag_zero,
@@ -130,6 +144,7 @@ architecture rtl of cpu is
 				sel => mux_beq_bne,
 				outp(0) => out_mux_beq_bne);
 
+		-- Mux que escolhe entre realizar branch e PC+4
 		mux_jump_beq_component: entity work.mux2x1
 		generic map (data_width => 32)
 		port map(A => outInc,
@@ -137,6 +152,7 @@ architecture rtl of cpu is
 				sel => mux_jump_beq and out_mux_beq_bne,
 				outp => outMuxJmp_beq);
 
+		-- Mux que escolhe entre realizar JUMP e PC+4/Branch
 		mux_jump_j_component: entity work.mux2x1
 		generic map (data_width => 32)
 		port map(A => outMuxJmp_beq,
@@ -144,6 +160,7 @@ architecture rtl of cpu is
 				sel => mux_jump_j,
 				outp => outMuxJmp_j);
 
+		-- Mux que escolhe entre realizar JR e PC+4/Branch/JUMP
 		mux_jump_jr_component: entity work.mux2x1
 		generic map (data_width => 32)
 		port map(A => outMuxJmp_j,
@@ -151,6 +168,7 @@ architecture rtl of cpu is
 				sel => mux_jump_jr,
 				outp => outMuxJmp_jr);
 		
+		-- Mux que escolhe se RT ou RD possui endereco de escrita
 		mux_RT_RD_component: entity work.mux2x1
 		generic map (data_width => 5)
 		port map(A => RTEND,
@@ -158,6 +176,7 @@ architecture rtl of cpu is
 				sel => muxRT_RD,
 				outp => out_muxRT_RD);
 
+		-- Mux que escolhe se RT_RD ou Registrador31 (ra) possui endereco de escrita
 		mux_RT_RD_R31_component: entity work.mux2x1
 		generic map (data_width => 5)
 		port map(A => out_muxRT_RD,
@@ -165,6 +184,7 @@ architecture rtl of cpu is
 				sel => muxRT_RD_R31,
 				outp => out_muxRT_RD_R31);
 		
+		-- Mux que escolhe entre imediato com sinal ou imediato sem sinal ou RT
 		mux_ime_RT_component: entity work.mux4x1
 		generic map (data_width => 32)
 		port map(A => outT,
@@ -174,6 +194,7 @@ architecture rtl of cpu is
 				sel => mux_ime_RT,
 				outp => out_mux_ime_RT);
 		
+		-- Mux que escolhe entre saida da ULA, saida da RAM, PC+4 e o LUI
 		mux_xnw_component: entity work.mux4x1
 		generic map (data_width => 32)
 		port map(A => outULA,
@@ -183,6 +204,7 @@ architecture rtl of cpu is
 				sel => mux_xnw,
 				outp => out_xnw);
 
+		-- Combina PC com imediato para criar o endereco do JUMP
 		combiner_component: entity work.combiner_PC_ime
 		port map(ime => ime_j,
 				PC => outInc(31 downto 28),

@@ -24,6 +24,7 @@ architecture rtl of Add32 is
     end component;
 
 begin
+	-- Realiza 32 Full Adders utilizando CarryIn
   	add0 : FullAdder port map ( a(0),  b(0),  carry_in,  r(0),  carry(0));
   	add1 : FullAdder port map ( a(1),  b(1),  carry(0),  r(1),  carry(1));
   	add2 : FullAdder port map ( a(2),  b(2),  carry(1),  r(2),  carry(2));
@@ -57,8 +58,7 @@ begin
   	add30: FullAdder port map (a(30), b(30), carry(29), r(30), carry(30));
   	add31: FullAdder port map (a(31), b(31), carry(30), r(31), carry(31));
 
+	-- Testa se ocorreu overflow
 	overflow <= carry(30) xor carry(31);
-	-- overflow <= (not(a(31)) and not(b(31)) and r(31)) or
-                -- (a(31) and b(31) and not(r(31)));
 
 end architecture;

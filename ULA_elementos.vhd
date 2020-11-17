@@ -9,8 +9,6 @@ entity ULA_elementos is
         B: in std_logic_vector((data_width-1) downto 0);
         commandULA : in std_logic_vector(2 downto 0);
         flag_zero : out std_logic;
---		  overflow_out : out std_logic;
---		  slt_out: out std_logic_vector((data_width-1) downto 0);
 		outp : out std_logic_vector((data_width-1) downto 0)
 	);
 end entity;
@@ -21,9 +19,11 @@ architecture rtl of ULA_elementos is
     signal overflow, negB : std_logic;
 	constant zero_vector : std_logic_vector((data_width-2) downto 0) := (OTHERS => '0');
     begin
+        -- 
         sel <= commandULA(1 downto 0);
         negB <= commandULA(2);
 
+        -- Realiza operacao de NOT em B se negB for 1
         mux_notB_component: entity work.mux2x1
         generic map (data_width => data_width)
         port map(A => B,
@@ -31,7 +31,8 @@ architecture rtl of ULA_elementos is
                 sel => negB,
                 outp => outMuxB);
 
-        mux_jump_component: entity work.mux4x1
+        -- Mux que escolhe qual das saidas saem da ULA
+        mux_ula_component: entity work.mux4x1
 		generic map (data_width => data_width)
 		port map(A => A and B,
 				B => A or B,
@@ -40,6 +41,7 @@ architecture rtl of ULA_elementos is
 				sel => sel,
                 outp => outMux4x1);
 
+        -- Realiza o Full_Adder de 32 bit, bit a bit, entre A e B
         add_diferenciado_component: entity work.Add32
         port map(a => A,
                  b => outMuxB,
@@ -47,13 +49,10 @@ architecture rtl of ULA_elementos is
                  r => outAddSub,
                  overflow => overflow);
 
+        -- SLT, seta o bit menos significativo caso A for menor que B
         SLT <= zero_vector & (overflow xor outAddSub(data_width-1));
 		  
---        SLT <= std_logic_vector(to_unsigned(1, data_width)) when signed(A) < signed(B) else (others => '0');
-
---		  slt_out <= SLT;
---		  overflow_out <= overflow;
-
+        -- Determina se a saida da ULA eh zero
         flag_zero <= '1' when (unsigned(outMux4x1) = 0) else '0';
 
 		outp <= outMux4x1;
