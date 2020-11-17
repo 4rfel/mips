@@ -9,17 +9,20 @@ entity mips is
             KEY         : in std_logic_vector(3 downto 0);
 
             LEDR : out std_logic_vector(9 downto 0);
-            HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : out std_logic_vector(6 downto 0);
+            HEX0, HEX1, HEX2, HEX3, HEX4, HEX5 : out std_logic_vector(6 downto 0)
+				);
 end entity;
 
 architecture rtl of mips is
     signal clk : std_logic := '0';
-    signal PC_out, PC_in, ULA_out, XNW_out, out_mux_sleep : out std_logic_vector(31 downto 0);
+    signal PC_out, PC_in, ULA_out, XNW_out, out_mux_sleep : std_logic_vector(31 downto 0);
+    signal outHex0, outHex1, outHex2, outHex3, outHex4, outHex5  : std_logic_vector(6 downto 0);
 
     begin
 
-        mips_component: entity work.mips
+        cpu_component: entity work.cpu
         port map(clk => clk,
+                RST => not KEY(1),
                 PC => PC_out,
                 ULA => ULA_out,
                 MUX_XNW_OUT => XNW_out);

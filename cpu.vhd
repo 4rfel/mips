@@ -12,6 +12,7 @@ entity cpu is
 	port
 	(
 		clk : in std_logic;
+		rst: in std_logic;
 
 		PC : out std_logic_vector((rom_width-1) downto 0);
 		ULA : out std_logic_vector(31 downto 0);
@@ -53,7 +54,7 @@ architecture rtl of cpu is
 				DOUT => outPC,
 				ENABLE => '1',
 				CLK => clk,
-				RST => not KEY(1));
+				RST => rst);
 
 		adder_component: entity work.adder
 		port map(A => outPC,
