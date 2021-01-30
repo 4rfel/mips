@@ -16,5 +16,6 @@ end entity;
 
 architecture rtl of adder is
 	begin
+		-- A+B
 		outp <= std_logic_vector(unsigned(A) + unsigned(B));
 end architecture;

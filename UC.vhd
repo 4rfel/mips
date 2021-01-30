@@ -3,26 +3,21 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;          -- Biblioteca IEEE para funções aritméticas
 
 entity UC is
-	port
-	(
+    port
+    (
         opcode: in std_logic_vector(5 downto 0);
         funct: in std_logic_vector(5 downto 0);
 
 
         enableWriteD, enableWriteRAM: out std_logic;
-        commandULA: out std_logic_vector(2 downto 0);
-        mux_jump : out std_logic_vector(1 downto 0);
-        mux_xnw, muxRT_RD, mux_ime_RT, mux_beq_bne: out std_logic
-	);
+        ULAop: out std_logic_vector(2 downto 0);
+        mux_xnw, mux_ime_RT : out std_logic_vector(1 downto 0);
+        muxRT_RD, mux_beq_bne, mux_jump_beq, mux_jump_j, mux_jump_jr, muxRT_RD_R31: out std_logic
+    );
 end entity;
 
 architecture rtl of UC is
-    constant f_add: std_logic_vector(5 downto 0) := "100000";
-    constant f_sub: std_logic_vector(5 downto 0) := "100010";
-    constant f_and: std_logic_vector(5 downto 0) := "100100";
-    constant f_or:  std_logic_vector(5 downto 0) := "100101";
-    constant f_slt: std_logic_vector(5 downto 0) := "101010";
-
+    -- Definicao dos OPCODE e FUNCT das instrucoes do MIPS
     constant o_load:  std_logic_vector(5 downto 0) := "100011";
     constant o_beq:   std_logic_vector(5 downto 0) := "000100";
     constant o_jmp:   std_logic_vector(5 downto 0) := "000010";
@@ -34,41 +29,56 @@ architecture rtl of UC is
     constant o_slti: std_logic_vector(5 downto 0) := "001010";
 
     constant o_bne:  std_logic_vector(5 downto 0) := "000101";
+    constant o_lui:  std_logic_vector(5 downto 0) := "001111";
     constant o_jal:  std_logic_vector(5 downto 0) := "000011";
     constant f_jr:   std_logic_vector(5 downto 0) := "001000";
-    constant o_jr:   std_logic_vector(5 downto 0) := "000000";
-
-    signal tipo_i : std_logic;
-    signal write_i : std_logic;
+    constant o_type_r:   std_logic_vector(5 downto 0) := "000000";
 
 begin
-    tipo_i <= '1' when (opcode = o_beq or opcode = o_load or opcode = o_jmp or 
-                        opcode = o_addi or opcode = o_ori or opcode = o_andi or
-                        opcode = o_slti) else '0';
+    -- habilita escrita no registrador de destino nos casos necessarios
+    enableWriteD <= '1' when (opcode = o_load or opcode = o_addi or opcode = o_ori or opcode = o_andi or
+                        opcode = o_slti or (opcode = o_type_r and funct /= f_jr) or opcode = o_jal) else '0';
 
-    write_i <= '1' when (opcode = o_load or opcode = o_addi or opcode = o_ori or opcode = o_andi or
-                        opcode = o_slti) else '0';
+    -- Comunica ao UC_ULA como ela deve interpretar a instrucao atual e os pontos de controle que tem que ativar
+    ULAop <= "000" when (opcode = o_load or opcode = o_store) else
+             "001" when (opcode = o_beq or opcode = o_bne)    else
+             "010" when (opcode = o_type_r) else
+             "011" when (opcode = o_andi)   else
+             "100" when (opcode = o_ori)    else
+             "101" when (opcode = o_addi)   else
+             "110" when (opcode = o_slti)   else
+             "111";
 
-    enableWriteD <= '1' when (opcode = "000000") or (write_i = '1') else '0';
+    -- Mux que chaveia entre a saida da ULA, RAM ,Signal_Extender do LUI e PC+4 
+    mux_xnw <= "01" when opcode = o_load else
+               "10" when opcode = o_jal else
+               "11" when opcode = o_lui else
+               "00";
 
-    commandULA <= "000" when (unsigned(opcode) = 0 and funct = f_add) or (opcode = o_addi) else -- add
-                  "001" when (unsigned(opcode) = 0 and funct = f_sub) or (opcode = o_beq) or (opcode = o_bne) else  -- sub
-                  "010" when (unsigned(opcode) = 0 and funct = f_and) or (opcode = o_andi) else  -- and
-                  "011" when (unsigned(opcode) = 0 and funct = f_or) or (opcode = o_ori) else  -- or
-                  "100" when (unsigned(opcode) = 0 and funct = f_slt) or (opcode = o_slti) else  -- menor
-                  "000";
+    -- Mux que chaveia entre RT_RD e Registrador31 (vra)
+    muxRT_RD_R31 <= '1' when opcode = o_jal else '0';
 
-    mux_xnw <= '1' when opcode = o_load else '0';
+    -- Mux que chaveira BRANCH ou PC+4
+    mux_jump_beq <= '1' when (opcode = o_beq) or (opcode = o_bne) else '0';
 
+    -- Mux que chaveira entre signal_extender do JUMP ou PC+4/Branch
+    mux_jump_j <= '1' when (opcode = o_jmp or opcode = o_jal) else '0';
 
-    mux_jump <= "01" when (opcode = o_beq) or (opcode = o_bne) else "10" when opcode = o_jmp else "11" when opcode = o_jmp else "00";
+    -- Mux que chaveira entre registrador de JUMP e PC+4/Branch/Jump
+    mux_jump_jr <= '1' when opcode = o_type_r and funct = f_jr else '0';
 
-    muxRT_RD <= not tipo_i;
+    -- Mux que escolhe se RT ou RD possui o endereco de escrita
+    muxRT_RD <= '1' when (opcode = o_type_r) else '0';
 
-    mux_ime_RT <= tipo_i;
+    -- Mux que escolhe qual valor entra na ULA
+    mux_ime_RT <= "01" when (opcode = o_load or opcode = o_store or
+                             opcode = o_addi or opcode = o_slti) else
+                  "10" when (opcode = o_andi or opcode = o_ori) else "00";
 
+    -- habilita a escrita da RAM quando o opcode for store
     enableWriteRAM <= '1' when opcode = o_store else '0';
 
+    -- Mux que chaveira entre tipos de branchs, branch equal ou branch not equal
     mux_beq_bne <= '1' when opcode = o_bne else '0';
 
 end architecture;

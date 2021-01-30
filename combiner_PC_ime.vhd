@@ -15,5 +15,6 @@ end entity;
 
 architecture rtl of combiner_PC_ime is
 	begin
+		-- PC(31:27) & imediato & 00
         outp <= PC & ime & "00";
 end architecture;

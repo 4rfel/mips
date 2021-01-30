@@ -65,7 +65,7 @@ set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST OFF -section_id eda_
 # Configuração dos pinos utilizados em Design de Computadores {{{
 
 # CLOCK {{{
-set_location_assignment PIN_M9 -to clk
+set_location_assignment PIN_M9 -to clk_soninho
 # }}}
 
 # HEX0 {{{
@@ -172,9 +172,26 @@ set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name VHDL_FILE conversorHEX.vhd
+set_global_assignment -name VHDL_FILE edge_detector.vhd
+set_global_assignment -name VHDL_FILE FullAdder.vhd
+set_global_assignment -name VHDL_FILE add_diferenciado.vhd
+set_global_assignment -name VHDL_FILE combiner_PC_ime.vhd
+set_global_assignment -name VHDL_FILE mux2x1.vhd
+set_global_assignment -name VHDL_FILE mux4x1.vhd
+set_global_assignment -name VHDL_FILE UC_ULA.vhd
+set_global_assignment -name VHDL_FILE signal_extender.vhd
+set_global_assignment -name VHDL_FILE mips.vhd
+set_global_assignment -name VHDL_FILE cpu.vhd
+set_global_assignment -name VHDL_FILE registrador.vhd
+set_global_assignment -name VHDL_FILE ULA_elementos.vhd
+set_global_assignment -name VHDL_FILE adder.vhd
+set_global_assignment -name VHDL_FILE bancoRegistradores.vhd
+set_global_assignment -name VHDL_FILE ROM.vhd
+set_global_assignment -name VHDL_FILE RAM.vhd
+set_global_assignment -name VHDL_FILE UC.vhd
+set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform.vwf
+set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform1.vwf
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[1]
@@ -257,18 +274,9 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[6]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[7]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[8]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[9]
-set_global_assignment -name VHDL_FILE combiner_PC_ime.vhd
-set_global_assignment -name VHDL_FILE mux2x1.vhd
-set_global_assignment -name VHDL_FILE mux4x1.vhd
-set_global_assignment -name VHDL_FILE signal_extender_shift.vhd
-set_global_assignment -name VHDL_FILE signal_extender.vhd
-set_global_assignment -name VHDL_FILE mips.vhd
-set_global_assignment -name VHDL_FILE registrador.vhd
-set_global_assignment -name VHDL_FILE ULA.vhd
-set_global_assignment -name VHDL_FILE adder.vhd
-set_global_assignment -name VHDL_FILE bancoRegistradores.vhd
-set_global_assignment -name VHDL_FILE ROM.vhd
-set_global_assignment -name VHDL_FILE RAM.vhd
-set_global_assignment -name VHDL_FILE UC.vhd
-set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform.vwf
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+
+
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
